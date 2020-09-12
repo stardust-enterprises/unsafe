@@ -9,7 +9,7 @@ public class Test{
     private long longValue = 0;
 
     public static void main(String[] args) throws InstantiationException, NoSuchFieldException{
-        var test = Unsafe.allocateInstance(Test.class);
+        final Test test = Unsafe.allocateInstance(Test.class);
 
         Unsafe.putByte(test, Unsafe.objectFieldOffset(Test.class.getDeclaredField("byteValue")), Byte.MAX_VALUE);
         Unsafe.putShort(test, Unsafe.objectFieldOffset(Test.class.getDeclaredField("shortValue")), Short.MAX_VALUE);
