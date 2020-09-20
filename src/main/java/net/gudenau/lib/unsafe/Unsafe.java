@@ -11,6 +11,8 @@ import java.security.ProtectionDomain;
 @SuppressWarnings({"unchecked", "unused", "RedundantSuppression"})
 public class Unsafe {
     public static final MethodHandles.Lookup trustedLookup;
+    public static final Class<?> Unsafe;
+    public static final Object theUnsafe;
 
     private static final MethodHandle getObjectInt;
     private static final MethodHandle putObjectInt;
@@ -850,34 +852,37 @@ public class Unsafe {
     static {
         try {
             final String version = System.getProperty("java.version");
-            final Class<?> Unsafe = Class.forName("sun.misc.Unsafe");
-            Object theUnsafe = null;
+            Class<?> klass = Class.forName("sun.misc.Unsafe");
+            Object temporaryUnsafe = null;
 
-            for (final Field field : Unsafe.getDeclaredFields()) {
-                if (field.getModifiers() == (Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL) && field.getType() == Unsafe) {
+            for (final Field field : klass.getDeclaredFields()) {
+                if (field.getModifiers() == (Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL) && field.getType() == klass) {
                     field.setAccessible(true);
 
-                    theUnsafe = field.get(null);
+                    temporaryUnsafe = field.get(null);
 
-                    if (theUnsafe != null) {
+                    if (temporaryUnsafe != null) {
                         break;
                     }
                 }
             }
 
-            assert theUnsafe != null;
+            assert temporaryUnsafe != null;
 
             final MethodHandles.Lookup lookup = MethodHandles.lookup();
-            trustedLookup = (MethodHandles.Lookup) (Object) lookup.bind(theUnsafe, "getObject", MethodType.methodType(Object.class, Object.class, long.class))
-                                                                  .invokeExact((Object) MethodHandles.Lookup.class, (long) lookup.bind(theUnsafe, "staticFieldOffset", MethodType.methodType(long.class, Field.class))
+            trustedLookup = (MethodHandles.Lookup) (Object) lookup.bind(temporaryUnsafe, "getObject", MethodType.methodType(Object.class, Object.class, long.class))
+                                                                  .invokeExact((Object) MethodHandles.Lookup.class, (long) lookup.bind(temporaryUnsafe, "staticFieldOffset", MethodType.methodType(long.class, Field.class))
                                                                                                                                  .invokeExact(MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP")));
 
             final boolean java9 = version.indexOf('.') != 1 || version.charAt(2) == '9';
 
             if (java9) {
-                final Class<?> jdkUnsafe = Class.forName("jdk.internal.misc.Unsafe");
-                theUnsafe = trustedLookup.findStatic(jdkUnsafe, "getUnsafe", MethodType.methodType(jdkUnsafe)).invoke();
+                klass = Class.forName("jdk.internal.misc.Unsafe");
+                temporaryUnsafe = trustedLookup.findStatic(klass, "getUnsafe", MethodType.methodType(klass)).invoke();
             }
+
+            Unsafe = klass;
+            theUnsafe = temporaryUnsafe;
 
             getObjectInt = trustedLookup.bind(theUnsafe, "getInt", MethodType.methodType(int.class, Object.class, long.class));
             getObjectObject = trustedLookup.bind(theUnsafe, "getObject", MethodType.methodType(Object.class, Object.class, long.class));
