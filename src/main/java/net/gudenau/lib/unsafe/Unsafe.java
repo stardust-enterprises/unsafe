@@ -533,8 +533,7 @@ public class Unsafe {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public static <A, P> Class<A> defineAnonymousClass(Class<P> hostClass, byte[] data, Object[] cpPatches) {
+    public static <A> Class<A> defineAnonymousClass(Class<?> hostClass, byte[] data, Object[] cpPatches) {
         try {
             return (Class<A>) defineAnonymousClass.invokeExact(hostClass, data, cpPatches);
         } catch (final Throwable throwable) {
@@ -542,7 +541,14 @@ public class Unsafe {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    public static <T> Class<T> defineClass(final String name, final byte[] bytecode, final int offset, final int length, final ClassLoader classLoader, final ProtectionDomain protectionDomain) {
+        try {
+            return (Class<T>) defineClass.invokeExact(name, bytecode, offset, length, classLoader, protectionDomain);
+        } catch (final Throwable throwable) {
+            throw new RuntimeException(throwable);
+        }
+    }
+
     public static <T> T allocateInstance(Class<T> cls) throws InstantiationException {
         try {
             return (T) (Object) allocateInstance.invokeExact(cls);
