@@ -549,11 +549,9 @@ public class Unsafe {
         }
     }
 
-    public static <T> T allocateInstance(Class<T> cls) throws InstantiationException {
+    public static <T> T allocateInstance(Class<T> cls) {
         try {
             return (T) (Object) allocateInstance.invokeExact(cls);
-        } catch (InstantiationException e) {
-            throw e;
         } catch (final Throwable throwable) {
             throw new RuntimeException(throwable);
         }
