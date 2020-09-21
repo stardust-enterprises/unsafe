@@ -129,10 +129,6 @@ public class Unsafe {
 
     public static final int INVALID_FIELD_OFFSET = -1;
 
-    public static void main(final String[] args) {
-
-    }
-
     public static int getInt(Object o, long offset) {
         try {
             return (int) getObjectInt.invokeExact(o, offset);
