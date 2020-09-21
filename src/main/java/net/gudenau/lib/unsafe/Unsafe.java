@@ -557,14 +557,6 @@ public class Unsafe {
         }
     }
 
-    public static void throwException(Throwable ee) {
-        try {
-            throwException.invokeExact(ee);
-        } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
-        }
-    }
-
     public static boolean compareAndSwapObject(Object o, long offset, Object expected, Object x) {
         try {
             return (boolean) compareAndSwapObject.invokeExact(o, offset, expected, x);
