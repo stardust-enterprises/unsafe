@@ -9,12 +9,8 @@ plugins {
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-group = "net.gudenau.lib"
-version = "1.2.13"
-
-static String name() {
-    return "unsafe"
-}
+project.group = "net.gudenau.lib"
+project.version = "1.2.14"
 
 repositories {
     mavenCentral()
@@ -28,17 +24,15 @@ bintray {
 
     pkg {
         repo = "maven"
-        name = name()
+        name = project.name
         licenses = ["LGPL-3.0"]
-        vcsUrl = "https://github.com/user11681/java-unsafe.git"
+        vcsUrl = "https://github.com/user11681/" + project.name + ".git"
 
         version {
-            name = version
-            desc = "a static Unsafe proxy for compatibility and concision"
+            name = project.version
             released = new Date()
-            vcsTag = "test"
-            githubRepo = "user11681/java-unsafe"
-            issueTrackerUrl = "https://github.com/user11681/java-unsafe/issues"
+            githubRepo = "user11681/" + project.name
+            issueTrackerUrl = "https://github.com/user11681/" + project.name +  "/issues"
         }
     }
 }
@@ -56,9 +50,9 @@ artifacts {
 publishing {
     publications {
         bintray(MavenPublication) {
-            groupId(group)
-            artifactId(name())
-            version(version)
+            groupId(project.group)
+            artifactId(project.name)
+            version(project.version)
 
             artifact(jar)
             artifact(sourceJar)
