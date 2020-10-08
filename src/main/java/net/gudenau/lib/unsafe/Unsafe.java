@@ -862,9 +862,11 @@ public class Unsafe {
             assert temporaryUnsafe != null;
 
             final MethodHandles.Lookup lookup = MethodHandles.lookup();
-            trustedLookup = (MethodHandles.Lookup) (Object) lookup.bind(temporaryUnsafe, "getObject", MethodType.methodType(Object.class, Object.class, long.class))
-                                                                  .invokeExact((Object) MethodHandles.Lookup.class, (long) lookup.bind(temporaryUnsafe, "staticFieldOffset", MethodType.methodType(long.class, Field.class))
-                                                                                                                                 .invokeExact(MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP")));
+
+            trustedLookup = (MethodHandles.Lookup) (Object) lookup
+                .bind(temporaryUnsafe, "getObject", MethodType.methodType(Object.class, Object.class, long.class))
+                .invokeExact((Object) MethodHandles.Lookup.class, (long) lookup.bind(temporaryUnsafe, "staticFieldOffset", MethodType.methodType(long.class, Field.class))
+                    .invokeExact(MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP")));
 
             final boolean java9 = version.indexOf('.') != 1 || version.charAt(2) == '9';
 
