@@ -7,6 +7,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
+import java.util.Iterator;
+import java.util.List;
 
 @SuppressWarnings({"unchecked", "unused", "RedundantSuppression"})
 public class Unsafe {
@@ -553,6 +555,10 @@ public class Unsafe {
         }
     }
 
+    public static void throwException(final Throwable throwable) {
+        UncheckedInvoker.throwException(throwable);
+    }
+
     public static boolean compareAndSwapObject(Object o, long offset, Object expected, Object x) {
         try {
             return (boolean) compareAndSwapObject.invokeExact(o, offset, expected, x);
@@ -1014,8 +1020,47 @@ public class Unsafe {
             ARRAY_OBJECT_INDEX_SCALE = arrayIndexScale(Object[].class);
 
             ADDRESS_SIZE = addressSize();
+
+            final String thisClassName = Unsafe.class.getName().replace('.', '/');
+            final String uncheckedInvokerName = thisClassName + "$UncheckedInvoker";
+            final Class<?> visitorClass = Class.forName("jdk.internal.org.objectweb.asm.ClassVisitor");
+            final Class<?> readerClass = Class.forName("jdk.internal.org.objectweb.asm.ClassReader");
+            final Class<?> nodeClass = Class.forName("jdk.internal.org.objectweb.asm.tree.ClassNode");
+            final Class<?> methodNodeClass = Class.forName("jdk.internal.org.objectweb.asm.tree.MethodNode");
+            final Class<?> writerClass = Class.forName("jdk.internal.org.objectweb.asm.ClassWriter");
+            final Object uncheckedInvoker = trustedLookup.findConstructor(nodeClass, MethodType.methodType(void.class)).invoke();
+            final MethodHandle nameGetter = trustedLookup.findGetter(methodNodeClass, "name", String.class);
+            trustedLookup.bind(trustedLookup.findConstructor(readerClass, MethodType.methodType(void.class, String.class)).invoke(uncheckedInvokerName), "accept", MethodType.methodType(void.class, visitorClass, int.class)).invoke(uncheckedInvoker, 0);
+            final List<Object> methods = (List<Object>) trustedLookup.findGetter(nodeClass, "methods", List.class).invoke(uncheckedInvoker);
+            final Iterator<Object> iterator = methods.iterator();
+
+            while (iterator.hasNext()) {
+                final Object method = iterator.next();
+
+                if ((nameGetter.invoke(method)).equals("throwException")) {
+                    final String methodHandleName = MethodHandle.class.getName().replace('.', '/');
+
+                    trustedLookup.bind(method, "visitFieldInsn", MethodType.methodType(void.class, int.class, String.class, String.class, String.class)).invoke(178, thisClassName, "throwException", 'L' + methodHandleName + ';');
+                    trustedLookup.bind(method, "visitVarInsn", MethodType.methodType(void.class, int.class, int.class)).invoke(25, 0);
+                    trustedLookup.bind(method, "visitMethodInsn", MethodType.methodType(void.class, int.class, String.class, String.class, String.class, boolean.class)).invoke(182, methodHandleName, "invokeExact", "([Ljava/lang/Object;)Ljava/lang/Object;", false);
+                    trustedLookup.bind(method, "visitInsn", MethodType.methodType(void.class, int.class)).invoke(177);
+                } else {
+                    iterator.remove();
+                }
+            }
+
+            final Object writer = trustedLookup.findConstructor(writerClass, MethodType.methodType(void.class, int.class)).invoke(2);
+            trustedLookup.bind(uncheckedInvoker, "accept", MethodType.methodType(void.class, visitorClass)).invoke(writer);
+
+            final byte[] bytecode = (byte[]) trustedLookup.bind(writer, "toByteArray", MethodType.methodType(byte[].class)).invokeExact();
+
+            defineClass(uncheckedInvokerName, bytecode, 0, bytecode.length, null, Unsafe.class.getProtectionDomain());
         } catch (final Throwable throwable) {
-            throw new RuntimeException("Failed to set up Unsafe", throwable);
+            throw new RuntimeException("failed to set up Unsafe", throwable);
         }
+    }
+
+    public static class UncheckedInvoker {
+        public static void throwException(final Throwable throwable) {}
     }
 }
