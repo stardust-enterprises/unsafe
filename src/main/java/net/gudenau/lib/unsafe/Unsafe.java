@@ -8,8 +8,6 @@ import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Logger;
 
 @SuppressWarnings({"unchecked", "unused", "RedundantSuppression", "ConstantConditions"})
@@ -560,9 +558,9 @@ public class Unsafe {
     }
 
     public static RuntimeException throwException(final Throwable throwable) {
-        UncheckedInvoker.throwException(throwable);
+        UncheckedInvoker.rethrow(throwable);
 
-        return new RuntimeException(throwable);
+        throw new RuntimeException(throwable);
     }
 
     public static boolean compareAndSwapObject(Object o, long offset, Object expected, Object x) {
@@ -1034,40 +1032,28 @@ public class Unsafe {
 
             ADDRESS_SIZE = addressSize();
 
-            final String thisClassName = Unsafe.class.getName().replace('.', '/');
-            final String uncheckedInvokerName = thisClassName + "$UncheckedInvoker";
+            final String uncheckedInvokerName = Unsafe.class.getName().replace('.', '/') + "$UncheckedInvoker";
             final Class<?> visitorClass = Class.forName("jdk.internal.org.objectweb.asm.ClassVisitor");
-            final Class<?> readerClass = Class.forName("jdk.internal.org.objectweb.asm.ClassReader");
-            final Class<?> nodeClass = Class.forName("jdk.internal.org.objectweb.asm.tree.ClassNode");
-            final Class<?> methodNodeClass = Class.forName("jdk.internal.org.objectweb.asm.tree.MethodNode");
             final Class<?> writerClass = Class.forName("jdk.internal.org.objectweb.asm.ClassWriter");
-            final Object uncheckedInvoker = trustedLookup.findConstructor(nodeClass, MethodType.methodType(void.class)).invoke();
-            final MethodHandle nameGetter = trustedLookup.findGetter(methodNodeClass, "name", String.class);
-            trustedLookup.bind(trustedLookup.findConstructor(readerClass, MethodType.methodType(void.class, String.class)).invoke(uncheckedInvokerName), "accept", MethodType.methodType(void.class, visitorClass, int.class)).invoke(uncheckedInvoker, 0);
-            final List<Object> methods = (List<Object>) trustedLookup.findGetter(nodeClass, "methods", List.class).invoke(uncheckedInvoker);
-            final Iterator<Object> iterator = methods.iterator();
+            final Object uncheckedInvoker = trustedLookup.findConstructor(Class.forName("jdk.internal.org.objectweb.asm.tree.ClassNode"), MethodType.methodType(void.class)).invoke();
 
-            while (iterator.hasNext()) {
-                final Object method = iterator.next();
+            trustedLookup.bind(uncheckedInvoker, "visit", MethodType.methodType(void.class, int.class, int.class, String.class, String.class, String.class, String[].class)).invoke(
+                52, 32, uncheckedInvokerName, null, "java/lang/Object", null
+            );
 
-                if ((nameGetter.invoke(method)).equals("throwException")) {
-                    final String methodHandleName = MethodHandle.class.getName().replace('.', '/');
+            final Object method = trustedLookup.bind(uncheckedInvoker, "visitMethod", MethodType.methodType(Class.forName("jdk.internal.org.objectweb.asm.MethodVisitor"), int.class, String.class, String.class, String.class, String[].class)).invoke(
+                9, "rethrow", "(Ljava/lang/Throwable;)V", null, new String[]{"java/lang/Throwable"}
+            );
 
-                    trustedLookup.bind(method, "visitFieldInsn", MethodType.methodType(void.class, int.class, String.class, String.class, String.class)).invoke(178, thisClassName, "throwException", 'L' + methodHandleName + ';');
-                    trustedLookup.bind(method, "visitVarInsn", MethodType.methodType(void.class, int.class, int.class)).invoke(25, 0);
-                    trustedLookup.bind(method, "visitMethodInsn", MethodType.methodType(void.class, int.class, String.class, String.class, String.class, boolean.class)).invoke(182, methodHandleName, "invokeExact", "([Ljava/lang/Object;)Ljava/lang/Object;", false);
-                    trustedLookup.bind(method, "visitInsn", MethodType.methodType(void.class, int.class)).invoke(177);
-                } else {
-                    iterator.remove();
-                }
-            }
+            trustedLookup.bind(method, "visitVarInsn", MethodType.methodType(void.class, int.class, int.class)).invoke(25, 0);
+            trustedLookup.bind(method, "visitInsn", MethodType.methodType(void.class, int.class)).invoke(191);
 
             final Object writer = trustedLookup.findConstructor(writerClass, MethodType.methodType(void.class, int.class)).invoke(2);
             trustedLookup.bind(uncheckedInvoker, "accept", MethodType.methodType(void.class, visitorClass)).invoke(writer);
 
             final byte[] bytecode = (byte[]) trustedLookup.bind(writer, "toByteArray", MethodType.methodType(byte[].class)).invokeExact();
 
-            defineClass(uncheckedInvokerName, bytecode, 0, bytecode.length, null, Unsafe.class.getProtectionDomain());
+            defineClass(uncheckedInvokerName, bytecode, 0, bytecode.length, Unsafe.class.getClassLoader(), Unsafe.class.getProtectionDomain());
         } catch (final Throwable throwable) {
             throw new RuntimeException("failed to set up Unsafe", throwable);
         }
@@ -1112,7 +1098,7 @@ public class Unsafe {
         return null;
     }
 
-    public static class UncheckedInvoker {
-        public static void throwException(final Throwable throwable) {}
+    private static final class UncheckedInvoker {
+        public static void rethrow(final Throwable throwable) {}
     }
 }

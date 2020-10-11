@@ -9,13 +9,22 @@ public class UnsafeTest {
     @Test
     public void throwableTest() throws Throwable {
         try {
-            Unsafe.throwException(new Throwable());
-        } catch (final RuntimeException exception) {
-            System.out.println("failure");
+            final Object object = Unsafe.throwException(new Throwable());
+        } catch (final Throwable throwable) {
+            if (throwable.getClass() == Throwable.class) {
+                System.out.println("success");
 
-            System.exit(1);
+                System.exit(0);
+            }
         }
 
-        System.out.println("success");
+        System.out.println("failure");
+
+        System.exit(1);
+    }
+
+    @Test
+    public void thhrow(final Throwable throwable) throws Throwable {
+        throw throwable;
     }
 }
