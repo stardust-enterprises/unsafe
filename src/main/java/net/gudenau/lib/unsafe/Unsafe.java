@@ -7,13 +7,17 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
-@SuppressWarnings({"unchecked", "unused", "RedundantSuppression"})
+@SuppressWarnings({"unchecked", "unused", "RedundantSuppression", "ConstantConditions"})
 public class Unsafe {
     public static final MethodHandles.Lookup trustedLookup;
+    public static final Class<?> SunUnsafe;
     public static final Class<?> Unsafe;
+    public static final Object theSunUnsafe;
     public static final Object theUnsafe;
 
     private static final MethodHandle getObjectInt;
@@ -851,12 +855,11 @@ public class Unsafe {
 
     static {
         try {
-            final String version = System.getProperty("java.version");
-            Class<?> klass = Class.forName("sun.misc.Unsafe");
+            SunUnsafe = Class.forName("sun.misc.Unsafe");
             Object temporaryUnsafe = null;
 
-            for (final Field field : klass.getDeclaredFields()) {
-                if (field.getModifiers() == (Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL) && field.getType() == klass) {
+            for (final Field field : SunUnsafe.getDeclaredFields()) {
+                if (field.getModifiers() == (Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL) && field.getType() == SunUnsafe) {
                     field.setAccessible(true);
 
                     temporaryUnsafe = field.get(null);
@@ -867,7 +870,7 @@ public class Unsafe {
                 }
             }
 
-            assert temporaryUnsafe != null;
+            theSunUnsafe = temporaryUnsafe;
 
             final MethodHandles.Lookup lookup = MethodHandles.lookup();
 
@@ -876,130 +879,138 @@ public class Unsafe {
                 .invokeExact((Object) MethodHandles.Lookup.class, (long) lookup.bind(temporaryUnsafe, "staticFieldOffset", MethodType.methodType(long.class, Field.class))
                     .invokeExact(MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP")));
 
+            final String version = System.getProperty("java.version");
             final boolean java9 = version.indexOf('.') != 1 || version.charAt(2) == '9';
 
             if (java9) {
-                klass = Class.forName("jdk.internal.misc.Unsafe");
-                temporaryUnsafe = trustedLookup.findStatic(klass, "getUnsafe", MethodType.methodType(klass)).invoke();
+                Unsafe = Class.forName("jdk.internal.misc.Unsafe");
+                temporaryUnsafe = trustedLookup.findStatic(Unsafe, "getUnsafe", MethodType.methodType(Unsafe)).invoke();
+            } else {
+                Unsafe = SunUnsafe;
             }
 
-            Unsafe = klass;
             theUnsafe = temporaryUnsafe;
 
-            getObjectInt = trustedLookup.bind(theUnsafe, "getInt", MethodType.methodType(int.class, Object.class, long.class));
-            getObjectObject = trustedLookup.bind(theUnsafe, "getObject", MethodType.methodType(Object.class, Object.class, long.class));
-            getObjectBoolean = trustedLookup.bind(theUnsafe, "getBoolean", MethodType.methodType(boolean.class, Object.class, long.class));
-            getObjectByte = trustedLookup.bind(theUnsafe, "getByte", MethodType.methodType(byte.class, Object.class, long.class));
-            getObjectShort = trustedLookup.bind(theUnsafe, "getShort", MethodType.methodType(short.class, Object.class, long.class));
-            getObjectChar = trustedLookup.bind(theUnsafe, "getChar", MethodType.methodType(char.class, Object.class, long.class));
-            getObjectLong = trustedLookup.bind(theUnsafe, "getLong", MethodType.methodType(long.class, Object.class, long.class));
-            getObjectFloat = trustedLookup.bind(theUnsafe, "getFloat", MethodType.methodType(float.class, Object.class, long.class));
-            getObjectDouble = trustedLookup.bind(theUnsafe, "getDouble", MethodType.methodType(double.class, Object.class, long.class));
+            getObjectInt = bind("getInt", int.class, Object.class, long.class);
+            getObjectObject = bind("getObject", Object.class, Object.class, long.class);
+            getObjectBoolean = bind("getBoolean", boolean.class, Object.class, long.class);
+            getObjectByte = bind("getByte", byte.class, Object.class, long.class);
+            getObjectShort = bind("getShort", short.class, Object.class, long.class);
+            getObjectChar = bind("getChar", char.class, Object.class, long.class);
+            getObjectLong = bind("getLong", long.class, Object.class, long.class);
+            getObjectFloat = bind("getFloat", float.class, Object.class, long.class);
+            getObjectDouble = bind("getDouble", double.class, Object.class, long.class);
 
-            putObjectInt = trustedLookup.bind(theUnsafe, "putInt", MethodType.methodType(void.class, Object.class, long.class, int.class));
-            putObjectObject = trustedLookup.bind(theUnsafe, "putObject", MethodType.methodType(void.class, Object.class, long.class, Object.class));
-            putObjectBoolean = trustedLookup.bind(theUnsafe, "putBoolean", MethodType.methodType(void.class, Object.class, long.class, boolean.class));
-            putObjectByte = trustedLookup.bind(theUnsafe, "putByte", MethodType.methodType(void.class, Object.class, long.class, byte.class));
-            putObjectShort = trustedLookup.bind(theUnsafe, "putShort", MethodType.methodType(void.class, Object.class, long.class, short.class));
-            putObjectChar = trustedLookup.bind(theUnsafe, "putChar", MethodType.methodType(void.class, Object.class, long.class, char.class));
-            putObjectLong = trustedLookup.bind(theUnsafe, "putLong", MethodType.methodType(void.class, Object.class, long.class, long.class));
-            putObjectFloat = trustedLookup.bind(theUnsafe, "putFloat", MethodType.methodType(void.class, Object.class, long.class, float.class));
-            putObjectDouble = trustedLookup.bind(theUnsafe, "putDouble", MethodType.methodType(void.class, Object.class, long.class, double.class));
+            putObjectInt = bind("putInt", void.class, Object.class, long.class, int.class);
+            putObjectObject = bind("putObject", void.class, Object.class, long.class, Object.class);
+            putObjectBoolean = bind("putBoolean", void.class, Object.class, long.class, boolean.class);
+            putObjectByte = bind("putByte", void.class, Object.class, long.class, byte.class);
+            putObjectShort = bind("putShort", void.class, Object.class, long.class, short.class);
+            putObjectChar = bind("putChar", void.class, Object.class, long.class, char.class);
+            putObjectLong = bind("putLong", void.class, Object.class, long.class, long.class);
+            putObjectFloat = bind("putFloat", void.class, Object.class, long.class, float.class);
+            putObjectDouble = bind("putDouble", void.class, Object.class, long.class, double.class);
 
-            getByte = trustedLookup.bind(theUnsafe, "getByte", MethodType.methodType(byte.class, long.class));
-            getShort = trustedLookup.bind(theUnsafe, "getShort", MethodType.methodType(short.class, long.class));
-            getChar = trustedLookup.bind(theUnsafe, "getChar", MethodType.methodType(char.class, long.class));
-            getInt = trustedLookup.bind(theUnsafe, "getInt", MethodType.methodType(int.class, long.class));
-            getLong = trustedLookup.bind(theUnsafe, "getLong", MethodType.methodType(long.class, long.class));
-            getFloat = trustedLookup.bind(theUnsafe, "getFloat", MethodType.methodType(float.class, long.class));
-            getDouble = trustedLookup.bind(theUnsafe, "getDouble", MethodType.methodType(double.class, long.class));
-            getAddress = trustedLookup.bind(theUnsafe, "getAddress", MethodType.methodType(long.class, long.class));
+            getByte = bind("getByte", byte.class, long.class);
+            getShort = bind("getShort", short.class, long.class);
+            getChar = bind("getChar", char.class, long.class);
+            getInt = bind("getInt", int.class, long.class);
+            getLong = bind("getLong", long.class, long.class);
+            getFloat = bind("getFloat", float.class, long.class);
+            getDouble = bind("getDouble", double.class, long.class);
+            getAddress = bind("getAddress", long.class, long.class);
 
-            putByte = trustedLookup.bind(theUnsafe, "putByte", MethodType.methodType(void.class, long.class, byte.class));
-            putShort = trustedLookup.bind(theUnsafe, "putShort", MethodType.methodType(void.class, long.class, short.class));
-            putChar = trustedLookup.bind(theUnsafe, "putChar", MethodType.methodType(void.class, long.class, char.class));
-            putInt = trustedLookup.bind(theUnsafe, "putInt", MethodType.methodType(void.class, long.class, int.class));
-            putLong = trustedLookup.bind(theUnsafe, "putLong", MethodType.methodType(void.class, long.class, long.class));
-            putFloat = trustedLookup.bind(theUnsafe, "putFloat", MethodType.methodType(void.class, long.class, float.class));
-            putDouble = trustedLookup.bind(theUnsafe, "putDouble", MethodType.methodType(void.class, long.class, double.class));
-            putAddress = trustedLookup.bind(theUnsafe, "putAddress", MethodType.methodType(void.class, long.class, long.class));
+            putByte = bind("putByte", void.class, long.class, byte.class);
+            putShort = bind("putShort", void.class, long.class, short.class);
+            putChar = bind("putChar", void.class, long.class, char.class);
+            putInt = bind("putInt", void.class, long.class, int.class);
+            putLong = bind("putLong", void.class, long.class, long.class);
+            putFloat = bind("putFloat", void.class, long.class, float.class);
+            putDouble = bind("putDouble", void.class, long.class, double.class);
+            putAddress = bind("putAddress", void.class, long.class, long.class);
 
-            allocateMemory = trustedLookup.bind(theUnsafe, "allocateMemory", MethodType.methodType(long.class, long.class));
-            reallocateMemory = trustedLookup.bind(theUnsafe, "reallocateMemory", MethodType.methodType(long.class, long.class, long.class));
-            setObjectMemory = trustedLookup.bind(theUnsafe, "setMemory", MethodType.methodType(void.class, Object.class, long.class, long.class, byte.class));
-            setMemory = trustedLookup.bind(theUnsafe, "setMemory", MethodType.methodType(void.class, long.class, long.class, byte.class));
-            copyObjectMemory = trustedLookup.bind(theUnsafe, "copyMemory", MethodType.methodType(void.class, Object.class, long.class, Object.class, long.class, long.class));
-            copyMemory = trustedLookup.bind(theUnsafe, "copyMemory", MethodType.methodType(void.class, long.class, long.class, long.class));
-            freeMemory = trustedLookup.bind(theUnsafe, "freeMemory", MethodType.methodType(void.class, long.class));
-            objectFieldOffset = trustedLookup.bind(theUnsafe, "objectFieldOffset", MethodType.methodType(long.class, Field.class));
-            staticFieldOffset = trustedLookup.bind(theUnsafe, "staticFieldOffset", MethodType.methodType(long.class, Field.class));
-            staticFieldBase = trustedLookup.bind(theUnsafe, "staticFieldBase", MethodType.methodType(Object.class, Field.class));
-            shouldBeInitialized = trustedLookup.bind(theUnsafe, "shouldBeInitialized", MethodType.methodType(boolean.class, Class.class));
-            ensureClassInitialized = trustedLookup.bind(theUnsafe, "ensureClassInitialized", MethodType.methodType(void.class, Class.class));
-            arrayBaseOffset = trustedLookup.bind(theUnsafe, "arrayBaseOffset", MethodType.methodType(int.class, Class.class));
-            arrayIndexScale = trustedLookup.bind(theUnsafe, "arrayIndexScale", MethodType.methodType(int.class, Class.class));
-            addressSize = trustedLookup.bind(theUnsafe, "addressSize", MethodType.methodType(int.class));
-            pageSize = trustedLookup.bind(theUnsafe, "pageSize", MethodType.methodType(int.class));
-            defineClass = trustedLookup.bind(theUnsafe, "defineClass", MethodType.methodType(Class.class, String.class, byte[].class, int.class, int.class, ClassLoader.class, ProtectionDomain.class));
-            defineAnonymousClass = trustedLookup.bind(theUnsafe, "defineAnonymousClass", MethodType.methodType(Class.class, Class.class, byte[].class, Object[].class));
-            allocateInstance = trustedLookup.bind(theUnsafe, "allocateInstance", MethodType.methodType(Object.class, Class.class));
-            throwException = trustedLookup.bind(theUnsafe, "throwException", MethodType.methodType(void.class, Throwable.class));
+            allocateMemory = bind("allocateMemory", long.class, long.class);
+            reallocateMemory = bind("reallocateMemory", long.class, long.class, long.class);
+            setObjectMemory = bind("setMemory", void.class, Object.class, long.class, long.class, byte.class);
+            setMemory = bind("setMemory", void.class, long.class, long.class, byte.class);
+            copyObjectMemory = bind("copyMemory", void.class, Object.class, long.class, Object.class, long.class, long.class);
+            copyMemory = bind("copyMemory", void.class, long.class, long.class, long.class);
+            freeMemory = bind("freeMemory", void.class, long.class);
+            objectFieldOffset = bind("objectFieldOffset", long.class, Field.class);
+            staticFieldOffset = bind("staticFieldOffset", long.class, Field.class);
+            staticFieldBase = bind("staticFieldBase", Object.class, Field.class);
+            shouldBeInitialized = bind("shouldBeInitialized", boolean.class, Class.class);
+            ensureClassInitialized = bind("ensureClassInitialized", void.class, Class.class);
+            arrayBaseOffset = bind("arrayBaseOffset", int.class, Class.class);
+            arrayIndexScale = bind("arrayIndexScale", int.class, Class.class);
+            addressSize = bind("addressSize", int.class);
+            pageSize = bind("pageSize", int.class);
+            defineClass = bind("defineClass", Class.class, String.class, byte[].class, int.class, int.class, ClassLoader.class, ProtectionDomain.class);
+            defineAnonymousClass = bind("defineAnonymousClass", Class.class, Class.class, byte[].class, Object[].class);
+            allocateInstance = bind("allocateInstance", Object.class, Class.class);
+            throwException = bind("throwException", void.class, Throwable.class);
 
             if (java9) {
-                compareAndSwapObject = trustedLookup.bind(theUnsafe, "compareAndSetObject", MethodType.methodType(boolean.class, Object.class, long.class, Object.class, Object.class));
-                compareAndSwapInt = trustedLookup.bind(theUnsafe, "compareAndSetInt", MethodType.methodType(boolean.class, Object.class, long.class, int.class, int.class));
-                compareAndSwapLong = trustedLookup.bind(theUnsafe, "compareAndSetLong", MethodType.methodType(boolean.class, Object.class, long.class, long.class, long.class));
+                compareAndSwapObject = bind("compareAndSetObject", boolean.class, Object.class, long.class, Object.class, Object.class);
+                compareAndSwapInt = bind("compareAndSetInt", boolean.class, Object.class, long.class, int.class, int.class);
+                compareAndSwapLong = bind("compareAndSetLong", boolean.class, Object.class, long.class, long.class, long.class);
             } else {
-                compareAndSwapObject = trustedLookup.bind(theUnsafe, "compareAndSwapObject", MethodType.methodType(boolean.class, Object.class, long.class, Object.class, Object.class));
-                compareAndSwapInt = trustedLookup.bind(theUnsafe, "compareAndSwapInt", MethodType.methodType(boolean.class, Object.class, long.class, int.class, int.class));
-                compareAndSwapLong = trustedLookup.bind(theUnsafe, "compareAndSwapLong", MethodType.methodType(boolean.class, Object.class, long.class, long.class, long.class));
+                compareAndSwapObject = bind("compareAndSwapObject", boolean.class, Object.class, long.class, Object.class, Object.class);
+                compareAndSwapInt = bind("compareAndSwapInt", boolean.class, Object.class, long.class, int.class, int.class);
+                compareAndSwapLong = bind("compareAndSwapLong", boolean.class, Object.class, long.class, long.class, long.class);
             }
 
-            getObjectVolatile = trustedLookup.bind(theUnsafe, "getObjectVolatile", MethodType.methodType(Object.class, Object.class, long.class));
-            getIntVolatile = trustedLookup.bind(theUnsafe, "getIntVolatile", MethodType.methodType(int.class, Object.class, long.class));
-            getBooleanVolatile = trustedLookup.bind(theUnsafe, "getBooleanVolatile", MethodType.methodType(boolean.class, Object.class, long.class));
-            getByteVolatile = trustedLookup.bind(theUnsafe, "getByteVolatile", MethodType.methodType(byte.class, Object.class, long.class));
-            getShortVolatile = trustedLookup.bind(theUnsafe, "getShortVolatile", MethodType.methodType(short.class, Object.class, long.class));
-            getCharVolatile = trustedLookup.bind(theUnsafe, "getCharVolatile", MethodType.methodType(char.class, Object.class, long.class));
-            getLongVolatile = trustedLookup.bind(theUnsafe, "getLongVolatile", MethodType.methodType(long.class, Object.class, long.class));
-            getFloatVolatile = trustedLookup.bind(theUnsafe, "getFloatVolatile", MethodType.methodType(float.class, Object.class, long.class));
-            getDoubleVolatile = trustedLookup.bind(theUnsafe, "getDoubleVolatile", MethodType.methodType(double.class, Object.class, long.class));
+            getObjectVolatile = bind("getObjectVolatile", Object.class, Object.class, long.class);
+            getIntVolatile = bind("getIntVolatile", int.class, Object.class, long.class);
+            getBooleanVolatile = bind("getBooleanVolatile", boolean.class, Object.class, long.class);
+            getByteVolatile = bind("getByteVolatile", byte.class, Object.class, long.class);
+            getShortVolatile = bind("getShortVolatile", short.class, Object.class, long.class);
+            getCharVolatile = bind("getCharVolatile", char.class, Object.class, long.class);
+            getLongVolatile = bind("getLongVolatile", long.class, Object.class, long.class);
+            getFloatVolatile = bind("getFloatVolatile", float.class, Object.class, long.class);
+            getDoubleVolatile = bind("getDoubleVolatile", double.class, Object.class, long.class);
 
-            putObjectVolatile = trustedLookup.bind(theUnsafe, "putObjectVolatile", MethodType.methodType(void.class, Object.class, long.class, Object.class));
-            putIntVolatile = trustedLookup.bind(theUnsafe, "putIntVolatile", MethodType.methodType(void.class, Object.class, long.class, int.class));
-            putBooleanVolatile = trustedLookup.bind(theUnsafe, "putBooleanVolatile", MethodType.methodType(void.class, Object.class, long.class, boolean.class));
-            putByteVolatile = trustedLookup.bind(theUnsafe, "putByteVolatile", MethodType.methodType(void.class, Object.class, long.class, byte.class));
-            putShortVolatile = trustedLookup.bind(theUnsafe, "putShortVolatile", MethodType.methodType(void.class, Object.class, long.class, short.class));
-            putCharVolatile = trustedLookup.bind(theUnsafe, "putCharVolatile", MethodType.methodType(void.class, Object.class, long.class, char.class));
-            putLongVolatile = trustedLookup.bind(theUnsafe, "putLongVolatile", MethodType.methodType(void.class, Object.class, long.class, long.class));
-            putFloatVolatile = trustedLookup.bind(theUnsafe, "putFloatVolatile", MethodType.methodType(void.class, Object.class, long.class, float.class));
-            putDoubleVolatile = trustedLookup.bind(theUnsafe, "putDoubleVolatile", MethodType.methodType(void.class, Object.class, long.class, double.class));
+            putObjectVolatile = bind("putObjectVolatile", void.class, Object.class, long.class, Object.class);
+            putIntVolatile = bind("putIntVolatile", void.class, Object.class, long.class, int.class);
+            putBooleanVolatile = bind("putBooleanVolatile", void.class, Object.class, long.class, boolean.class);
+            putByteVolatile = bind("putByteVolatile", void.class, Object.class, long.class, byte.class);
+            putShortVolatile = bind("putShortVolatile", void.class, Object.class, long.class, short.class);
+            putCharVolatile = bind("putCharVolatile", void.class, Object.class, long.class, char.class);
+            putLongVolatile = bind("putLongVolatile", void.class, Object.class, long.class, long.class);
+            putFloatVolatile = bind("putFloatVolatile", void.class, Object.class, long.class, float.class);
+            putDoubleVolatile = bind("putDoubleVolatile", void.class, Object.class, long.class, double.class);
 
             if (java9) {
-                putOrderedObject = trustedLookup.bind(theUnsafe, "putReferenceRelease", MethodType.methodType(void.class, Object.class, long.class, Object.class));
-                putOrderedInt = trustedLookup.bind(theUnsafe, "putIntRelease", MethodType.methodType(void.class, Object.class, long.class, int.class));
-                putOrderedLong = trustedLookup.bind(theUnsafe, "putLongRelease", MethodType.methodType(void.class, Object.class, long.class, long.class));
+                MethodHandle putReferenceRelease;
+
+                if ((putReferenceRelease = bindSilent("putReferenceRelease", void.class, Object.class, long.class, Object.class)) == null) {
+                    putReferenceRelease = bind("putObjectRelease", void.class, Object.class, long.class, Object.class);
+                }
+
+                putOrderedObject = putReferenceRelease;
+                putOrderedInt = bind("putIntRelease", void.class, Object.class, long.class, int.class);
+                putOrderedLong = bind("putLongRelease", void.class, Object.class, long.class, long.class);
             } else {
                 putOrderedObject = trustedLookup.bind(theUnsafe, "putOrderedObject", MethodType.methodType(void.class, Object.class, long.class, Object.class));
                 putOrderedInt = trustedLookup.bind(theUnsafe, "putOrderedInt", MethodType.methodType(void.class, Object.class, long.class, int.class));
                 putOrderedLong = trustedLookup.bind(theUnsafe, "putOrderedLong", MethodType.methodType(void.class, Object.class, long.class, long.class));
             }
 
-            unpark = trustedLookup.bind(theUnsafe, "unpark", MethodType.methodType(void.class, Object.class));
-            park = trustedLookup.bind(theUnsafe, "park", MethodType.methodType(void.class, boolean.class, long.class));
-            getLoadAverage = trustedLookup.bind(theUnsafe, "getLoadAverage", MethodType.methodType(int.class, double[].class, int.class));
+            unpark = bind("unpark", void.class, Object.class);
+            park = bind("park", void.class, boolean.class, long.class);
 
-            getAndAddInt = trustedLookup.bind(theUnsafe, "getAndAddInt", MethodType.methodType(int.class, Object.class, long.class, int.class));
-            getAndAddLong = trustedLookup.bind(theUnsafe, "getAndAddLong", MethodType.methodType(long.class, Object.class, long.class, long.class));
-            getAndSetInt = trustedLookup.bind(theUnsafe, "getAndSetInt", MethodType.methodType(int.class, Object.class, long.class, int.class));
-            getAndSetLong = trustedLookup.bind(theUnsafe, "getAndSetLong", MethodType.methodType(long.class, Object.class, long.class, long.class));
-            getAndSetObject = trustedLookup.bind(theUnsafe, "getAndSetObject", MethodType.methodType(Object.class, Object.class, long.class, Object.class));
+            getLoadAverage = bind("getLoadAverage", int.class, double[].class, int.class);
+            getAndAddInt = bind("getAndAddInt", int.class, Object.class, long.class, int.class);
+            getAndAddLong = bind("getAndAddLong", long.class, Object.class, long.class, long.class);
+            getAndSetInt = bind("getAndSetInt", int.class, Object.class, long.class, int.class);
+            getAndSetLong = bind("getAndSetLong", long.class, Object.class, long.class, long.class);
+            getAndSetObject = bind("getAndSetObject", Object.class, Object.class, long.class, Object.class);
 
-            loadFence = trustedLookup.bind(theUnsafe, "loadFence", MethodType.methodType(void.class));
-            storeFence = trustedLookup.bind(theUnsafe, "storeFence", MethodType.methodType(void.class));
-            fullFence = trustedLookup.bind(theUnsafe, "fullFence", MethodType.methodType(void.class));
+            loadFence = bind("loadFence", void.class);
+            storeFence = bind("storeFence", void.class);
+            fullFence = bind("fullFence", void.class);
 
-            invokeCleaner = java9 ? trustedLookup.bind(theUnsafe, "invokeCleaner", MethodType.methodType(void.class, ByteBuffer.class)) : null;
+            invokeCleaner = bindSilent("invokeCleaner", void.class, ByteBuffer.class);
 
             ARRAY_BOOLEAN_BASE_OFFSET = arrayBaseOffset(boolean[].class);
             ARRAY_BYTE_BASE_OFFSET = arrayBaseOffset(byte[].class);
@@ -1060,6 +1071,43 @@ public class Unsafe {
         } catch (final Throwable throwable) {
             throw new RuntimeException("failed to set up Unsafe", throwable);
         }
+    }
+
+    private static MethodHandle bindSilent(final String method, final Class<?> returnType, final Class<?>... parameterTypes) {
+        try {
+            return trustedLookup.bind(theUnsafe, method, MethodType.methodType(returnType, parameterTypes));
+        } catch (final NoSuchMethodException exception) {
+            try {
+                return trustedLookup.bind(theUnsafe, method, MethodType.methodType(returnType, parameterTypes));
+            } catch (final NoSuchMethodException | IllegalAccessException failed) {
+                return null;
+            }
+        } catch (final IllegalAccessException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    private static MethodHandle bind(final String method, final Class<?> returnType, final Class<?>... parameterTypes) {
+        Throwable feedback = null;
+
+        try {
+            return trustedLookup.bind(theUnsafe, method, MethodType.methodType(returnType, parameterTypes));
+        } catch (final NoSuchMethodException exception) {
+            try {
+                return trustedLookup.bind(theSunUnsafe, method, MethodType.methodType(returnType, parameterTypes));
+            } catch (final IllegalAccessException | NoSuchMethodException failed) {
+                feedback = failed;
+            }
+        } catch (final IllegalAccessException failed) {
+            feedback = failed;
+        }
+
+        final Logger logger = Logger.getLogger("Unsafe");
+        final String parameterString = Arrays.toString(parameterTypes);
+
+        logger.warning(String.format("Unable to access Unsafe method %s%s\n%s.", method, '(' + parameterString.substring(1, parameterString.length() - 1) + ')', feedback));
+
+        return null;
     }
 
     public static class UncheckedInvoker {
