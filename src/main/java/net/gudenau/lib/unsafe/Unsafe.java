@@ -1088,7 +1088,7 @@ public class Unsafe {
     }
 
     private static MethodHandle bind(final String method, final Class<?> returnType, final Class<?>... parameterTypes) {
-        Throwable feedback = null;
+        final Throwable feedback;
 
         try {
             return trustedLookup.bind(theUnsafe, method, MethodType.methodType(returnType, parameterTypes));
