@@ -10,7 +10,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 project.group = "net.gudenau.lib"
-project.version = "1.2.15"
+project.version = "1.2.16"
 
 repositories {
     mavenCentral()
