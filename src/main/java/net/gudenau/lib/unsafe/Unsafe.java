@@ -1079,8 +1079,10 @@ public class Unsafe {
         } catch (final NoSuchMethodException exception) {
             try {
                 return trustedLookup.bind(theUnsafe, method, MethodType.methodType(returnType, parameterTypes));
-            } catch (final NoSuchMethodException | IllegalAccessException failed) {
+            } catch (final NoSuchMethodException failed) {
                 return null;
+            } catch (final IllegalAccessException failed) {
+                throw new RuntimeException(failed);
             }
         } catch (final IllegalAccessException exception) {
             throw new RuntimeException(exception);
