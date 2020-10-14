@@ -979,13 +979,12 @@ public class Unsafe {
             putDoubleVolatile = bind("putDoubleVolatile", void.class, Object.class, long.class, double.class);
 
             if (java9) {
-                MethodHandle putReferenceRelease;
+                final MethodHandle putReferenceRelease = bindSilent("putReferenceRelease", void.class, Object.class, long.class, Object.class);
 
-                if ((putReferenceRelease = bindSilent("putReferenceRelease", void.class, Object.class, long.class, Object.class)) == null) {
-                    putReferenceRelease = bind("putObjectRelease", void.class, Object.class, long.class, Object.class);
-                }
+                putOrderedObject = putReferenceRelease == null
+                    ? bind("putObjectRelease", void.class, Object.class, long.class, Object.class)
+                    : putReferenceRelease;
 
-                putOrderedObject = putReferenceRelease;
                 putOrderedInt = bind("putIntRelease", void.class, Object.class, long.class, int.class);
                 putOrderedLong = bind("putLongRelease", void.class, Object.class, long.class, long.class);
             } else {
