@@ -11,12 +11,12 @@ public class UnsafeTest {
         try {
             final Object exception = Unsafe.throwException(new Throwable());
         } catch (final Throwable throwable) {
+            throwable.printStackTrace();
+
             if (throwable.getClass() == Throwable.class) {
                 System.out.println("success");
 
                 System.exit(0);
-            } else {
-                throwable.printStackTrace();
             }
         }
 

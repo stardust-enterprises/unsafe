@@ -18,6 +18,30 @@ public class Unsafe {
     public static final Object theSunUnsafe;
     public static final Object theUnsafe;
 
+    public static final int ARRAY_BOOLEAN_BASE_OFFSET;
+    public static final int ARRAY_BYTE_BASE_OFFSET;
+    public static final int ARRAY_SHORT_BASE_OFFSET;
+    public static final int ARRAY_CHAR_BASE_OFFSET;
+    public static final int ARRAY_INT_BASE_OFFSET;
+    public static final int ARRAY_LONG_BASE_OFFSET;
+    public static final int ARRAY_FLOAT_BASE_OFFSET;
+    public static final int ARRAY_DOUBLE_BASE_OFFSET;
+    public static final int ARRAY_OBJECT_BASE_OFFSET;
+
+    public static final int ARRAY_BOOLEAN_INDEX_SCALE;
+    public static final int ARRAY_BYTE_INDEX_SCALE;
+    public static final int ARRAY_SHORT_INDEX_SCALE;
+    public static final int ARRAY_CHAR_INDEX_SCALE;
+    public static final int ARRAY_INT_INDEX_SCALE;
+    public static final int ARRAY_LONG_INDEX_SCALE;
+    public static final int ARRAY_FLOAT_INDEX_SCALE;
+    public static final int ARRAY_DOUBLE_INDEX_SCALE;
+    public static final int ARRAY_OBJECT_INDEX_SCALE;
+
+    public static final int ADDRESS_SIZE;
+
+    public static final int INVALID_FIELD_OFFSET = -1;
+
     private static final MethodHandle getObjectInt;
     private static final MethodHandle putObjectInt;
     private static final MethodHandle getObjectObject;
@@ -109,29 +133,7 @@ public class Unsafe {
     private static final MethodHandle fullFence;
     private static final MethodHandle invokeCleaner;
 
-    public static final int ARRAY_BOOLEAN_BASE_OFFSET;
-    public static final int ARRAY_BYTE_BASE_OFFSET;
-    public static final int ARRAY_SHORT_BASE_OFFSET;
-    public static final int ARRAY_CHAR_BASE_OFFSET;
-    public static final int ARRAY_INT_BASE_OFFSET;
-    public static final int ARRAY_LONG_BASE_OFFSET;
-    public static final int ARRAY_FLOAT_BASE_OFFSET;
-    public static final int ARRAY_DOUBLE_BASE_OFFSET;
-    public static final int ARRAY_OBJECT_BASE_OFFSET;
-
-    public static final int ARRAY_BOOLEAN_INDEX_SCALE;
-    public static final int ARRAY_BYTE_INDEX_SCALE;
-    public static final int ARRAY_SHORT_INDEX_SCALE;
-    public static final int ARRAY_CHAR_INDEX_SCALE;
-    public static final int ARRAY_INT_INDEX_SCALE;
-    public static final int ARRAY_LONG_INDEX_SCALE;
-    public static final int ARRAY_FLOAT_INDEX_SCALE;
-    public static final int ARRAY_DOUBLE_INDEX_SCALE;
-    public static final int ARRAY_OBJECT_INDEX_SCALE;
-
-    public static final int ADDRESS_SIZE;
-
-    public static final int INVALID_FIELD_OFFSET = -1;
+    private static final boolean uncheckedInvokerDefined;
 
     public static int getInt(Object o, long offset) {
         try {
@@ -558,7 +560,9 @@ public class Unsafe {
     }
 
     public static RuntimeException throwException(final Throwable throwable) {
-        UncheckedInvoker.rethrow(throwable);
+        if (uncheckedInvokerDefined) {
+            UncheckedInvoker.rethrow(throwable);
+        }
 
         throw new RuntimeException(throwable);
     }
@@ -1031,28 +1035,40 @@ public class Unsafe {
 
             ADDRESS_SIZE = addressSize();
 
-            final String uncheckedInvokerName = Unsafe.class.getName().replace('.', '/') + "$UncheckedInvoker";
-            final Class<?> visitorClass = Class.forName("jdk.internal.org.objectweb.asm.ClassVisitor");
-            final Class<?> writerClass = Class.forName("jdk.internal.org.objectweb.asm.ClassWriter");
-            final Object uncheckedInvoker = trustedLookup.findConstructor(Class.forName("jdk.internal.org.objectweb.asm.tree.ClassNode"), MethodType.methodType(void.class)).invoke();
+            boolean success = false;
 
-            trustedLookup.bind(uncheckedInvoker, "visit", MethodType.methodType(void.class, int.class, int.class, String.class, String.class, String.class, String[].class)).invoke(
-                52, 32, uncheckedInvokerName, null, "java/lang/Object", null
-            );
+            try {
+                final String uncheckedInvokerName = Unsafe.class.getName().replace('.', '/') + "$UncheckedInvoker";
+                final Class<?> visitorClass = Class.forName("jdk.internal.org.objectweb.asm.ClassVisitor");
+                final Class<?> writerClass = Class.forName("jdk.internal.org.objectweb.asm.ClassWriter");
+                final Object uncheckedInvoker = trustedLookup.findConstructor(Class.forName("jdk.internal.org.objectweb.asm.tree.ClassNode"), MethodType.methodType(void.class)).invoke();
 
-            final Object method = trustedLookup.bind(uncheckedInvoker, "visitMethod", MethodType.methodType(Class.forName("jdk.internal.org.objectweb.asm.MethodVisitor"), int.class, String.class, String.class, String.class, String[].class)).invoke(
-                9, "rethrow", "(Ljava/lang/Throwable;)V", null, new String[]{"java/lang/Throwable"}
-            );
+                trustedLookup.bind(uncheckedInvoker, "visit", MethodType.methodType(void.class, int.class, int.class, String.class, String.class, String.class, String[].class)).invoke(
+                    52, 32, uncheckedInvokerName, null, "java/lang/Object", null
+                );
 
-            trustedLookup.bind(method, "visitVarInsn", MethodType.methodType(void.class, int.class, int.class)).invoke(25, 0);
-            trustedLookup.bind(method, "visitInsn", MethodType.methodType(void.class, int.class)).invoke(191);
+                final Object method = trustedLookup.bind(uncheckedInvoker, "visitMethod", MethodType.methodType(Class.forName("jdk.internal.org.objectweb.asm.MethodVisitor"), int.class, String.class, String.class, String.class, String[].class)).invoke(
+                    9, "rethrow", "(Ljava/lang/Throwable;)V", null, new String[]{"java/lang/Throwable"}
+                );
 
-            final Object writer = trustedLookup.findConstructor(writerClass, MethodType.methodType(void.class, int.class)).invoke(2);
-            trustedLookup.bind(uncheckedInvoker, "accept", MethodType.methodType(void.class, visitorClass)).invoke(writer);
+                trustedLookup.bind(method, "visitVarInsn", MethodType.methodType(void.class, int.class, int.class)).invoke(25, 0);
+                trustedLookup.bind(method, "visitInsn", MethodType.methodType(void.class, int.class)).invoke(191);
 
-            final byte[] bytecode = (byte[]) trustedLookup.bind(writer, "toByteArray", MethodType.methodType(byte[].class)).invokeExact();
+                final Object writer = trustedLookup.findConstructor(writerClass, MethodType.methodType(void.class, int.class)).invoke(2);
+                trustedLookup.bind(uncheckedInvoker, "accept", MethodType.methodType(void.class, visitorClass)).invoke(writer);
 
-            defineClass.invoke(uncheckedInvokerName, bytecode, 0, bytecode.length, Unsafe.class.getClassLoader(), Unsafe.class.getProtectionDomain());
+                final byte[] bytecode = (byte[]) trustedLookup.bind(writer, "toByteArray", MethodType.methodType(byte[].class)).invokeExact();
+
+                defineClass.invoke(uncheckedInvokerName, bytecode, 0, bytecode.length, Unsafe.class.getClassLoader(), Unsafe.class.getProtectionDomain());
+
+                success = true;
+            } catch (final Throwable throwable) {
+                System.err.println("Unable to define UncheckedInvoker; resorting to RuntimeException wrapping.");
+
+                throwable.printStackTrace();
+            }
+
+            uncheckedInvokerDefined = success;
         } catch (final Throwable throwable) {
             throw new RuntimeException("failed to set up Unsafe", throwable);
         }
