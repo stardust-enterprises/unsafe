@@ -9,12 +9,14 @@ public class UnsafeTest {
     @Test
     public void throwableTest() throws Throwable {
         try {
-            final Object object = Unsafe.throwException(new Throwable());
+            final Object exception = Unsafe.throwException(new Throwable());
         } catch (final Throwable throwable) {
             if (throwable.getClass() == Throwable.class) {
                 System.out.println("success");
 
                 System.exit(0);
+            } else {
+                throwable.printStackTrace();
             }
         }
 

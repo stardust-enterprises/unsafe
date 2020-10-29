@@ -137,7 +137,7 @@ public class Unsafe {
         try {
             return (int) getObjectInt.invokeExact(o, offset);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -145,7 +145,7 @@ public class Unsafe {
         try {
             putObjectInt.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -153,7 +153,7 @@ public class Unsafe {
         try {
             return getObjectObject.invokeExact(o, offset);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -161,7 +161,7 @@ public class Unsafe {
         try {
             putObjectObject.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -169,7 +169,7 @@ public class Unsafe {
         try {
             return (boolean) getObjectBoolean.invokeExact(o, offset);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -177,7 +177,7 @@ public class Unsafe {
         try {
             putObjectBoolean.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -185,7 +185,7 @@ public class Unsafe {
         try {
             return (byte) getObjectByte.invokeExact(o, offset);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -193,7 +193,7 @@ public class Unsafe {
         try {
             putObjectByte.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -201,7 +201,7 @@ public class Unsafe {
         try {
             return (short) getObjectShort.invokeExact(o, offset);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -209,7 +209,7 @@ public class Unsafe {
         try {
             putObjectShort.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -217,7 +217,7 @@ public class Unsafe {
         try {
             return (char) getObjectChar.invokeExact(o, offset);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -225,7 +225,7 @@ public class Unsafe {
         try {
             putObjectChar.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -233,7 +233,7 @@ public class Unsafe {
         try {
             return (long) getObjectLong.invokeExact(o, offset);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -241,7 +241,7 @@ public class Unsafe {
         try {
             putObjectLong.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -249,7 +249,7 @@ public class Unsafe {
         try {
             return (float) getObjectFloat.invokeExact(o, offset);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -257,7 +257,7 @@ public class Unsafe {
         try {
             putObjectFloat.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -265,7 +265,7 @@ public class Unsafe {
         try {
             return (double) getObjectDouble.invokeExact(o, offset);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -273,7 +273,7 @@ public class Unsafe {
         try {
             putObjectDouble.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -281,7 +281,7 @@ public class Unsafe {
         try {
             return (byte) getByte.invokeExact(address);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -289,7 +289,7 @@ public class Unsafe {
         try {
             putByte.invokeExact(address, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -297,7 +297,7 @@ public class Unsafe {
         try {
             return (short) getShort.invokeExact(address);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -305,7 +305,7 @@ public class Unsafe {
         try {
             putShort.invokeExact(address, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -313,7 +313,7 @@ public class Unsafe {
         try {
             return (char) getChar.invokeExact(address);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -321,7 +321,7 @@ public class Unsafe {
         try {
             putChar.invokeExact(address, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -329,7 +329,7 @@ public class Unsafe {
         try {
             return (int) getInt.invokeExact(address);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -337,7 +337,7 @@ public class Unsafe {
         try {
             putInt.invokeExact(address, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -345,7 +345,7 @@ public class Unsafe {
         try {
             return (long) getLong.invokeExact(address);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -353,7 +353,7 @@ public class Unsafe {
         try {
             putLong.invokeExact(address, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -361,7 +361,7 @@ public class Unsafe {
         try {
             return (float) getFloat.invokeExact(address);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -369,7 +369,7 @@ public class Unsafe {
         try {
             putFloat.invokeExact(address, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -377,7 +377,7 @@ public class Unsafe {
         try {
             return (double) getDouble.invokeExact(address);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -385,7 +385,7 @@ public class Unsafe {
         try {
             putDouble.invokeExact(address, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -393,7 +393,7 @@ public class Unsafe {
         try {
             return (long) getAddress.invokeExact(address);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -401,7 +401,7 @@ public class Unsafe {
         try {
             putAddress.invokeExact(address, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -409,7 +409,7 @@ public class Unsafe {
         try {
             return (long) allocateMemory.invokeExact(bytes);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -417,7 +417,7 @@ public class Unsafe {
         try {
             return (long) reallocateMemory.invokeExact(address, bytes);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -425,7 +425,7 @@ public class Unsafe {
         try {
             setObjectMemory.invokeExact(o, offset, bytes, value);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -433,7 +433,7 @@ public class Unsafe {
         try {
             setMemory.invokeExact(address, bytes, value);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -441,7 +441,7 @@ public class Unsafe {
         try {
             copyObjectMemory.invokeExact(srcBase, srcOffset, destBase, destOffset, bytes);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -449,7 +449,7 @@ public class Unsafe {
         try {
             copyMemory.invokeExact(srcAddress, destAddress, bytes);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -457,7 +457,7 @@ public class Unsafe {
         try {
             freeMemory.invokeExact(address);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -465,7 +465,7 @@ public class Unsafe {
         try {
             return (long) objectFieldOffset.invokeExact(f);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -473,7 +473,7 @@ public class Unsafe {
         try {
             return (long) staticFieldOffset.invokeExact(f);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -481,7 +481,7 @@ public class Unsafe {
         try {
             return (Object) staticFieldBase.invokeExact(f);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -489,7 +489,7 @@ public class Unsafe {
         try {
             return (boolean) shouldBeInitialized.invokeExact(klass);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -497,7 +497,7 @@ public class Unsafe {
         try {
             ensureClassInitialized.invokeExact(c);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -505,7 +505,7 @@ public class Unsafe {
         try {
             return (int) arrayBaseOffset.invokeExact(arrayClass);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -513,7 +513,7 @@ public class Unsafe {
         try {
             return (int) arrayIndexScale.invokeExact(arrayClass);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -521,7 +521,7 @@ public class Unsafe {
         try {
             return (int) addressSize.invokeExact();
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -529,7 +529,7 @@ public class Unsafe {
         try {
             return (int) pageSize.invokeExact();
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -537,7 +537,7 @@ public class Unsafe {
         try {
             return (Class<A>) defineAnonymousClass.invokeExact(hostClass, data, cpPatches);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -545,7 +545,7 @@ public class Unsafe {
         try {
             return (Class<T>) defineClass.invokeExact(name, bytecode, offset, length, classLoader, protectionDomain);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -553,7 +553,7 @@ public class Unsafe {
         try {
             return (T) (Object) allocateInstance.invokeExact(cls);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -567,7 +567,7 @@ public class Unsafe {
         try {
             return (boolean) compareAndSwapObject.invokeExact(o, offset, expected, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -575,7 +575,7 @@ public class Unsafe {
         try {
             return (boolean) compareAndSwapInt.invokeExact(o, offset, expected, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -583,7 +583,7 @@ public class Unsafe {
         try {
             return (boolean) compareAndSwapLong.invokeExact(o, offset, expected, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -591,7 +591,7 @@ public class Unsafe {
         try {
             return (Object) getObjectVolatile.invokeExact(o, offset);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -599,7 +599,7 @@ public class Unsafe {
         try {
             putObjectVolatile.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -607,7 +607,7 @@ public class Unsafe {
         try {
             return (int) getIntVolatile.invokeExact(o, offset);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -615,7 +615,7 @@ public class Unsafe {
         try {
             putIntVolatile.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -623,7 +623,7 @@ public class Unsafe {
         try {
             return (boolean) getBooleanVolatile.invokeExact(o, offset);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -631,7 +631,7 @@ public class Unsafe {
         try {
             putBooleanVolatile.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -639,7 +639,7 @@ public class Unsafe {
         try {
             return (byte) getByteVolatile.invokeExact(o, offset);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -647,7 +647,7 @@ public class Unsafe {
         try {
             putByteVolatile.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -655,7 +655,7 @@ public class Unsafe {
         try {
             return (short) getShortVolatile.invokeExact(o, offset);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -663,7 +663,7 @@ public class Unsafe {
         try {
             putShortVolatile.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -671,7 +671,7 @@ public class Unsafe {
         try {
             return (char) getCharVolatile.invokeExact(o, offset);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -679,7 +679,7 @@ public class Unsafe {
         try {
             putCharVolatile.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -687,7 +687,7 @@ public class Unsafe {
         try {
             return (long) getLongVolatile.invokeExact(o, offset);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -695,7 +695,7 @@ public class Unsafe {
         try {
             putLongVolatile.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -703,7 +703,7 @@ public class Unsafe {
         try {
             return (float) getFloatVolatile.invokeExact(o, offset);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -711,7 +711,7 @@ public class Unsafe {
         try {
             putFloatVolatile.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -719,7 +719,7 @@ public class Unsafe {
         try {
             return (double) getDoubleVolatile.invokeExact(o, offset);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -727,7 +727,7 @@ public class Unsafe {
         try {
             putDoubleVolatile.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -735,7 +735,7 @@ public class Unsafe {
         try {
             putOrderedObject.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -743,7 +743,7 @@ public class Unsafe {
         try {
             putOrderedInt.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -751,7 +751,7 @@ public class Unsafe {
         try {
             putOrderedLong.invokeExact(o, offset, x);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -759,7 +759,7 @@ public class Unsafe {
         try {
             unpark.invokeExact(thread);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -767,7 +767,7 @@ public class Unsafe {
         try {
             park.invokeExact(isAbsolute, time);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -775,7 +775,7 @@ public class Unsafe {
         try {
             return (int) getLoadAverage.invokeExact(loadavg, nelems);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -783,7 +783,7 @@ public class Unsafe {
         try {
             return (int) getAndAddInt.invokeExact(o, offset, delta);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -791,7 +791,7 @@ public class Unsafe {
         try {
             return (long) getAndAddLong.invokeExact(o, offset, delta);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -799,7 +799,7 @@ public class Unsafe {
         try {
             return (int) getAndSetInt.invokeExact(o, offset, newValue);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -807,7 +807,7 @@ public class Unsafe {
         try {
             return (long) getAndSetLong.invokeExact(o, offset, newValue);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -815,7 +815,7 @@ public class Unsafe {
         try {
             return (T) (Object) getAndSetObject.invokeExact(o, offset, (Object) newValue);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -823,7 +823,7 @@ public class Unsafe {
         try {
             loadFence.invokeExact();
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -831,7 +831,7 @@ public class Unsafe {
         try {
             storeFence.invokeExact();
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -839,7 +839,7 @@ public class Unsafe {
         try {
             fullFence.invokeExact();
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -847,7 +847,7 @@ public class Unsafe {
         try {
             invokeCleaner.invokeExact(directBuffer);
         } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+            throw throwException(throwable);
         }
     }
 
@@ -1052,7 +1052,7 @@ public class Unsafe {
 
             final byte[] bytecode = (byte[]) trustedLookup.bind(writer, "toByteArray", MethodType.methodType(byte[].class)).invokeExact();
 
-            defineClass(uncheckedInvokerName, bytecode, 0, bytecode.length, Unsafe.class.getClassLoader(), Unsafe.class.getProtectionDomain());
+            defineClass.invoke(uncheckedInvokerName, bytecode, 0, bytecode.length, Unsafe.class.getClassLoader(), Unsafe.class.getProtectionDomain());
         } catch (final Throwable throwable) {
             throw new RuntimeException("failed to set up Unsafe", throwable);
         }
