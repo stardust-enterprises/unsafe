@@ -133,8 +133,6 @@ public class Unsafe {
     private static final MethodHandle fullFence;
     private static final MethodHandle invokeCleaner;
 
-    private static final boolean uncheckedInvokerDefined;
-
     public static int getInt(Object o, long offset) {
         try {
             return (int) getObjectInt.invokeExact(o, offset);
@@ -447,7 +445,7 @@ public class Unsafe {
         }
     }
 
-    public static void copyMemory(long srcAddress, long destAddress, long bytes) {
+    public static void copyMemory(final long srcAddress, final long destAddress, final long bytes) {
         try {
             copyMemory.invokeExact(srcAddress, destAddress, bytes);
         } catch (final Throwable throwable) {
@@ -455,7 +453,7 @@ public class Unsafe {
         }
     }
 
-    public static void freeMemory(long address) {
+    public static void freeMemory(final long address) {
         try {
             freeMemory.invokeExact(address);
         } catch (final Throwable throwable) {
@@ -463,25 +461,25 @@ public class Unsafe {
         }
     }
 
-    public static long objectFieldOffset(Field f) {
+    public static long objectFieldOffset(final Field field) {
         try {
-            return (long) objectFieldOffset.invokeExact(f);
+            return (long) objectFieldOffset.invokeExact(field);
         } catch (final Throwable throwable) {
             throw throwException(throwable);
         }
     }
 
-    public static long staticFieldOffset(final Field f) {
+    public static long staticFieldOffset(final Field field) {
         try {
-            return (long) staticFieldOffset.invokeExact(f);
+            return (long) staticFieldOffset.invokeExact(field);
         } catch (final Throwable throwable) {
             throw throwException(throwable);
         }
     }
 
-    public static Object staticFieldBase(final Field f) {
+    public static Object staticFieldBase(final Field field) {
         try {
-            return (Object) staticFieldBase.invokeExact(f);
+            return (Object) staticFieldBase.invokeExact(field);
         } catch (final Throwable throwable) {
             throw throwException(throwable);
         }
@@ -560,11 +558,7 @@ public class Unsafe {
     }
 
     public static RuntimeException throwException(final Throwable throwable) {
-        if (uncheckedInvokerDefined) {
-            UncheckedInvoker.rethrow(throwable);
-        }
-
-        throw new RuntimeException(throwable);
+        throw UncheckedInvokerKt.rethrow(throwable);
     }
 
     public static boolean compareAndSwapObject(Object o, long offset, Object expected, Object x) {
@@ -1034,41 +1028,6 @@ public class Unsafe {
             ARRAY_OBJECT_INDEX_SCALE = arrayIndexScale(Object[].class);
 
             ADDRESS_SIZE = addressSize();
-
-            boolean success = false;
-
-            try {
-                final String uncheckedInvokerName = Unsafe.class.getName().replace('.', '/') + "$UncheckedInvoker";
-                final Class<?> visitorClass = Class.forName("jdk.internal.org.objectweb.asm.ClassVisitor");
-                final Class<?> writerClass = Class.forName("jdk.internal.org.objectweb.asm.ClassWriter");
-                final Object uncheckedInvoker = trustedLookup.findConstructor(Class.forName("jdk.internal.org.objectweb.asm.tree.ClassNode"), MethodType.methodType(void.class)).invoke();
-
-                trustedLookup.bind(uncheckedInvoker, "visit", MethodType.methodType(void.class, int.class, int.class, String.class, String.class, String.class, String[].class)).invoke(
-                    52, 32, uncheckedInvokerName, null, "java/lang/Object", null
-                );
-
-                final Object method = trustedLookup.bind(uncheckedInvoker, "visitMethod", MethodType.methodType(Class.forName("jdk.internal.org.objectweb.asm.MethodVisitor"), int.class, String.class, String.class, String.class, String[].class)).invoke(
-                    9, "rethrow", "(Ljava/lang/Throwable;)V", null, new String[]{"java/lang/Throwable"}
-                );
-
-                trustedLookup.bind(method, "visitVarInsn", MethodType.methodType(void.class, int.class, int.class)).invoke(25, 0);
-                trustedLookup.bind(method, "visitInsn", MethodType.methodType(void.class, int.class)).invoke(191);
-
-                final Object writer = trustedLookup.findConstructor(writerClass, MethodType.methodType(void.class, int.class)).invoke(2);
-                trustedLookup.bind(uncheckedInvoker, "accept", MethodType.methodType(void.class, visitorClass)).invoke(writer);
-
-                final byte[] bytecode = (byte[]) trustedLookup.bind(writer, "toByteArray", MethodType.methodType(byte[].class)).invokeExact();
-
-                defineClass.invoke(uncheckedInvokerName, bytecode, 0, bytecode.length, Unsafe.class.getClassLoader(), Unsafe.class.getProtectionDomain());
-
-                success = true;
-            } catch (final Throwable throwable) {
-                System.err.println("Unable to define UncheckedInvoker; resorting to RuntimeException wrapping.");
-
-                throwable.printStackTrace();
-            }
-
-            uncheckedInvokerDefined = success;
         } catch (final Throwable throwable) {
             throw new RuntimeException("failed to set up Unsafe", throwable);
         }
@@ -1111,9 +1070,5 @@ public class Unsafe {
         logger.warning(String.format("Unable to access Unsafe method %s%s\n%s.", method, '(' + parameterString.substring(1, parameterString.length() - 1) + ')', feedback));
 
         return null;
-    }
-
-    private static final class UncheckedInvoker {
-        public static void rethrow(final Throwable throwable) {}
     }
 }

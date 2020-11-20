@@ -4,13 +4,14 @@ plugins {
     id("maven")
     id("maven-publish")
     id("com.jfrog.bintray") version("1.8.5")
+    id("org.jetbrains.kotlin.jvm") version("1.4.20")
 }
 
 sourceCompatibility = 8
 targetCompatibility = 8
 
 project.group = "net.gudenau.lib"
-project.version = "1.3.4"
+project.version = "1.4.0"
 
 repositories {
     mavenCentral()
@@ -18,6 +19,7 @@ repositories {
 
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:+")
+    compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 }
 
 bintray {
@@ -65,5 +67,15 @@ publishing {
 
     repositories {
         mavenLocal()
+    }
+}
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 }

@@ -3,20 +3,22 @@ package net.gudenau.lib.unsafe;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.annotation.Testable;
 
-@SuppressWarnings("FieldCanBeLocal")
+@SuppressWarnings({"FieldCanBeLocal", "StringEquality"})
 @Testable
 public class UnsafeTest {
     @Test
-    public void throwableTest() throws Throwable {
-        try {
-            final Object exception = Unsafe.throwException(new Throwable());
-        } catch (final Throwable throwable) {
-            throwable.printStackTrace();
+    public void throwableTest() {
+        final String message = "Throwable message";
 
-            if (throwable.getClass() == Throwable.class) {
+        try {
+            final Object exception = Unsafe.throwException(new Throwable(message));
+        } catch (final Throwable throwable) {
+            throwable.printStackTrace(System.out);
+
+            if (throwable.getClass() == Throwable.class && throwable.getMessage() == message) {
                 System.out.println("success");
 
-                System.exit(0);
+                return;
             }
         }
 
