@@ -7,6 +7,11 @@ import org.junit.platform.commons.annotation.Testable;
 @Testable
 public class UnsafeTest {
     @Test
+    public void genericCast() {
+        assert Unsafe.allocateInstance(UnsafeTest.class) != null;
+    }
+
+    @Test
     public void throwableTest() {
         final String message = "Throwable message";
 

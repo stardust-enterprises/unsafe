@@ -551,7 +551,7 @@ public class Unsafe {
 
     public static <T> T allocateInstance(Class<T> cls) {
         try {
-            return (T) (Object) allocateInstance.invokeExact(cls);
+            return (T) allocateInstance.invokeExact(cls);
         } catch (final Throwable throwable) {
             throw throwException(throwable);
         }
@@ -811,7 +811,7 @@ public class Unsafe {
 
     public static <T> T getAndSetObject(Object o, long offset, T newValue) {
         try {
-            return (T) (Object) getAndSetObject.invokeExact(o, offset, (Object) newValue);
+            return (T) getAndSetObject.invokeExact(o, offset, (Object) newValue);
         } catch (final Throwable throwable) {
             throw throwException(throwable);
         }
