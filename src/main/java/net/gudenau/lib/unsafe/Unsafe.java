@@ -577,17 +577,17 @@ public class Unsafe {
         }
     }
 
-    public static boolean compareAndSwapLong(Object o, long offset, long expected, long x) {
+    public static boolean compareAndSwapLong(final Object object, final long offset, final long expected, final long x) {
         try {
-            return (boolean) compareAndSwapLong.invokeExact(o, offset, expected, x);
+            return (boolean) compareAndSwapLong.invokeExact(object, offset, expected, x);
         } catch (final Throwable throwable) {
             throw throwException(throwable);
         }
     }
 
-    public static Object getObjectVolatile(Object o, long offset) {
+    public static <T> T getObjectVolatile(final Object object, long offset) {
         try {
-            return (Object) getObjectVolatile.invokeExact(o, offset);
+            return (T) getObjectVolatile.invokeExact(object, offset);
         } catch (final Throwable throwable) {
             throw throwException(throwable);
         }
