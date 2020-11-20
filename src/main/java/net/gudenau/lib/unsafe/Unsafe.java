@@ -10,7 +10,7 @@ import java.security.ProtectionDomain;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
-@SuppressWarnings({"unchecked", "unused", "RedundantSuppression", "ConstantConditions"})
+@SuppressWarnings({"unchecked", "unused", "RedundantSuppression", "ConstantConditions", "SameParameterValue"})
 public class Unsafe {
     public static final MethodHandles.Lookup trustedLookup;
     public static final Class<?> SunUnsafe;
@@ -849,6 +849,34 @@ public class Unsafe {
         }
     }
 
+    private static MethodHandle bindSilent(final String method, final Class<?> returnType, final Class<?>... parameterTypes) {
+        try {
+            try {
+                return trustedLookup.bind(theUnsafe, method, MethodType.methodType(returnType, parameterTypes));
+            } catch (final NoSuchMethodException exception) {
+                return trustedLookup.bind(theUnsafe, method, MethodType.methodType(returnType, parameterTypes));
+            }
+        } catch (final Throwable throwable) {
+            return null;
+        }
+    }
+
+    private static MethodHandle bind(final String method, final Class<?> returnType, final Class<?>... parameterTypes) {
+        try {
+            try {
+                return trustedLookup.bind(theUnsafe, method, MethodType.methodType(returnType, parameterTypes));
+            } catch (final NoSuchMethodException exception) {
+                return trustedLookup.bind(theSunUnsafe, method, MethodType.methodType(returnType, parameterTypes));
+            }
+        } catch (final Throwable failed) {
+            final String parameterString = Arrays.toString(parameterTypes);
+
+            Logger.getLogger("Unsafe").warning(String.format("Unable to access Unsafe method %s%s\n%s.", method, '(' + parameterString.substring(1, parameterString.length() - 1) + ')', failed));
+
+            return null;
+        }
+    }
+
     static {
         try {
             SunUnsafe = Class.forName("sun.misc.Unsafe");
@@ -946,16 +974,6 @@ public class Unsafe {
             allocateInstance = bind("allocateInstance", Object.class, Class.class);
             throwException = bind("throwException", void.class, Throwable.class);
 
-            if (java9) {
-                compareAndSwapObject = bind("compareAndSetObject", boolean.class, Object.class, long.class, Object.class, Object.class);
-                compareAndSwapInt = bind("compareAndSetInt", boolean.class, Object.class, long.class, int.class, int.class);
-                compareAndSwapLong = bind("compareAndSetLong", boolean.class, Object.class, long.class, long.class, long.class);
-            } else {
-                compareAndSwapObject = bind("compareAndSwapObject", boolean.class, Object.class, long.class, Object.class, Object.class);
-                compareAndSwapInt = bind("compareAndSwapInt", boolean.class, Object.class, long.class, int.class, int.class);
-                compareAndSwapLong = bind("compareAndSwapLong", boolean.class, Object.class, long.class, long.class, long.class);
-            }
-
             getObjectVolatile = bind("getObjectVolatile", Object.class, Object.class, long.class);
             getIntVolatile = bind("getIntVolatile", int.class, Object.class, long.class);
             getBooleanVolatile = bind("getBooleanVolatile", boolean.class, Object.class, long.class);
@@ -977,6 +995,10 @@ public class Unsafe {
             putDoubleVolatile = bind("putDoubleVolatile", void.class, Object.class, long.class, double.class);
 
             if (java9) {
+                compareAndSwapObject = bind("compareAndSetObject", boolean.class, Object.class, long.class, Object.class, Object.class);
+                compareAndSwapInt = bind("compareAndSetInt", boolean.class, Object.class, long.class, int.class, int.class);
+                compareAndSwapLong = bind("compareAndSetLong", boolean.class, Object.class, long.class, long.class, long.class);
+
                 final MethodHandle putReferenceRelease = bindSilent("putReferenceRelease", void.class, Object.class, long.class, Object.class);
 
                 putOrderedObject = putReferenceRelease == null
@@ -986,6 +1008,10 @@ public class Unsafe {
                 putOrderedInt = bind("putIntRelease", void.class, Object.class, long.class, int.class);
                 putOrderedLong = bind("putLongRelease", void.class, Object.class, long.class, long.class);
             } else {
+                compareAndSwapObject = bind("compareAndSwapObject", boolean.class, Object.class, long.class, Object.class, Object.class);
+                compareAndSwapInt = bind("compareAndSwapInt", boolean.class, Object.class, long.class, int.class, int.class);
+                compareAndSwapLong = bind("compareAndSwapLong", boolean.class, Object.class, long.class, long.class, long.class);
+
                 putOrderedObject = trustedLookup.bind(theUnsafe, "putOrderedObject", MethodType.methodType(void.class, Object.class, long.class, Object.class));
                 putOrderedInt = trustedLookup.bind(theUnsafe, "putOrderedInt", MethodType.methodType(void.class, Object.class, long.class, int.class));
                 putOrderedLong = trustedLookup.bind(theUnsafe, "putOrderedLong", MethodType.methodType(void.class, Object.class, long.class, long.class));
@@ -1029,46 +1055,7 @@ public class Unsafe {
 
             ADDRESS_SIZE = addressSize();
         } catch (final Throwable throwable) {
-            throw new RuntimeException("failed to set up Unsafe", throwable);
+            throw throwException(throwable);
         }
-    }
-
-    private static MethodHandle bindSilent(final String method, final Class<?> returnType, final Class<?>... parameterTypes) {
-        try {
-            return trustedLookup.bind(theUnsafe, method, MethodType.methodType(returnType, parameterTypes));
-        } catch (final NoSuchMethodException exception) {
-            try {
-                return trustedLookup.bind(theUnsafe, method, MethodType.methodType(returnType, parameterTypes));
-            } catch (final NoSuchMethodException failed) {
-                return null;
-            } catch (final IllegalAccessException failed) {
-                throw new RuntimeException(failed);
-            }
-        } catch (final IllegalAccessException exception) {
-            throw new RuntimeException(exception);
-        }
-    }
-
-    private static MethodHandle bind(final String method, final Class<?> returnType, final Class<?>... parameterTypes) {
-        final Throwable feedback;
-
-        try {
-            return trustedLookup.bind(theUnsafe, method, MethodType.methodType(returnType, parameterTypes));
-        } catch (final NoSuchMethodException exception) {
-            try {
-                return trustedLookup.bind(theSunUnsafe, method, MethodType.methodType(returnType, parameterTypes));
-            } catch (final IllegalAccessException | NoSuchMethodException failed) {
-                feedback = failed;
-            }
-        } catch (final IllegalAccessException failed) {
-            feedback = failed;
-        }
-
-        final Logger logger = Logger.getLogger("Unsafe");
-        final String parameterString = Arrays.toString(parameterTypes);
-
-        logger.warning(String.format("Unable to access Unsafe method %s%s\n%s.", method, '(' + parameterString.substring(1, parameterString.length() - 1) + ')', feedback));
-
-        return null;
     }
 }
