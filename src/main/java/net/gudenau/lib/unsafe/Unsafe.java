@@ -558,7 +558,7 @@ public class Unsafe {
     }
 
     public static RuntimeException throwException(final Throwable throwable) {
-        throw UncheckedInvokerKt.rethrow(throwable);
+        throw UncheckedInvokerKt.throwThrowable(throwable);
     }
 
     public static boolean compareAndSwapObject(Object o, long offset, Object expected, Object x) {
