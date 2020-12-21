@@ -13,11 +13,11 @@ public class UnsafeTest {
 
     @Test
     public void throwableTest() {
-        final String message = "Throwable message";
+        String message = "Throwable message";
 
         try {
-            final Object exception = Unsafe.throwException(new Throwable(message));
-        } catch (final Throwable throwable) {
+            Object exception = Unsafe.throwException(new Throwable(message));
+        } catch (Throwable throwable) {
             throwable.printStackTrace(System.out);
 
             if (throwable.getClass() == Throwable.class && throwable.getMessage() == message) {
@@ -30,10 +30,5 @@ public class UnsafeTest {
         System.out.println("failure");
 
         System.exit(1);
-    }
-
-    @Test
-    public void thhrow(final Throwable throwable) throws Throwable {
-        throw throwable;
     }
 }

@@ -1,10 +1,7 @@
 plugins {
-    id("java")
     id("java-library")
-    id("maven")
     id("maven-publish")
-    id("com.jfrog.bintray") version("1.8.5")
-    id("org.jetbrains.kotlin.jvm") version("1.4.20")
+    id("com.jfrog.bintray").version("1.8.5")
 }
 
 sourceCompatibility = 8
@@ -19,7 +16,27 @@ repositories {
 
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:+")
-    compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+}
+
+java {
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        bintray(MavenPublication) {
+            groupId = project.group
+            artifactId = project.name
+            version = project.version
+
+            artifact(jar)
+            artifact(sourcesJar)
+        }
+    }
+
+    repositories {
+        mavenLocal()
+    }
 }
 
 bintray {
@@ -32,50 +49,12 @@ bintray {
         repo = "maven"
         name = project.name
         licenses = ["LGPL-3.0"]
-        vcsUrl = "https://github.com/user11681/" + project.name + ".git"
+        vcsUrl = "https://github.com/user11681/unsafe.git"
 
         version {
             name = project.version
             released = new Date()
-            githubRepo = "user11681/" + project.name
-            issueTrackerUrl = "https://github.com/user11681/" + project.name +  "/issues"
+            issueTrackerUrl = "https://github.com/user11681/unsafe/issues"
         }
-    }
-}
-
-task sourceJar(type: Jar, dependsOn: classes) {
-    archiveClassifier.set("sources")
-
-    from(sourceSets.main.allSource)
-}
-
-artifacts {
-    archives sourceJar
-}
-
-publishing {
-    publications {
-        bintray(MavenPublication) {
-            groupId(project.group)
-            artifactId(project.name)
-            version(project.version)
-
-            artifact(jar)
-            artifact(sourceJar)
-        }
-    }
-
-    repositories {
-        mavenLocal()
-    }
-}
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
     }
 }
