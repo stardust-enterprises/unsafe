@@ -8,7 +8,7 @@ sourceCompatibility = 8
 targetCompatibility = 8
 
 project.group = "net.gudenau.lib"
-project.version = "1.4.0"
+project.version = "1.4.1"
 
 repositories {
     mavenCentral()
