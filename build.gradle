@@ -1,14 +1,14 @@
 plugins {
     id("java-library")
     id("maven-publish")
-    id("com.jfrog.bintray").version("1.8.5")
+    id("com.jfrog.artifactory").version("4.21.0")
 }
 
 sourceCompatibility = 8
 targetCompatibility = 8
 
-project.group = "net.gudenau.lib"
-project.version = "1.4.1"
+group("net.gudenau.lib")
+version("1.4.1")
 
 repositories {
     mavenCentral()
@@ -24,13 +24,12 @@ java {
 
 publishing {
     publications {
-        bintray(MavenPublication) {
-            groupId = project.group
-            artifactId = project.name
-            version = project.version
+        maven(MavenPublication) {
+            groupId(project.group)
+            artifactId(project.name)
+            version(project.version)
 
-            artifact(jar)
-            artifact(sourcesJar)
+            from(components.java)
         }
     }
 
@@ -39,22 +38,18 @@ publishing {
     }
 }
 
-bintray {
-    user = System.getenv("BINTRAY_USER")
-    key = System.getenv("BINTRAY_API_KEY")
-    publications = ["bintray"]
-    publish = true
+artifactory {
+    publish {
+        contextUrl = "https://auoeke.jfrog.io/artifactory"
 
-    pkg {
-        repo = "maven"
-        name = project.name
-        licenses = ["LGPL-3.0"]
-        vcsUrl = "https://github.com/user11681/unsafe.git"
+        repository {
+            repoKey = "maven"
+            username = System.env["ARTIFACTORY_USERNAME"]
+            password = System.env["ARTIFACTORY_PASSWORD"]
+        }
 
-        version {
-            name = project.version
-            released = new Date()
-            issueTrackerUrl = "https://github.com/user11681/unsafe/issues"
+        defaults {
+            publications("maven")
         }
     }
 }

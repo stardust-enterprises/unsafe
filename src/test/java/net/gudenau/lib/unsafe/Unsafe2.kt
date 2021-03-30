@@ -552,7 +552,7 @@ object Unsafe2 {
                 .bind(temporaryUnsafe, "getObject", MethodType.methodType(Object, Object, long))
                 .invokeExact(Lookup, lookup.bind(temporaryUnsafe, "staticFieldOffset", MethodType.methodType(long, Field))
                         .invokeExact(Lookup.getDeclaredField("IMPL_LOOKUP")) as Long) as MethodHandles.Lookup
-        val version = System.getProperty("java.version")
+        val version: String = System.getProperty("java.version")
         val java9 = version.indexOf('.') != 1 || version[2] == '9'
 
         if (java9) {

@@ -872,8 +872,8 @@ public class Unsafe {
             } catch (final NoSuchMethodException exception) {
                 return trustedLookup.bind(theSunUnsafe, method, MethodType.methodType(returnType, parameterTypes));
             }
-        } catch (final Throwable failed) {
-            final String parameterString = Arrays.toString(parameterTypes);
+        } catch (Throwable failed) {
+            String parameterString = Arrays.toString(parameterTypes);
 
             Logger.getLogger("Unsafe").warning(String.format("Unable to access Unsafe method %s%s\n%s.", method, '(' + parameterString.substring(1, parameterString.length() - 1) + ')', failed));
 
@@ -886,7 +886,7 @@ public class Unsafe {
             SunUnsafe = Class.forName("sun.misc.Unsafe");
             Object temporaryUnsafe = null;
 
-            for (final Field field : SunUnsafe.getDeclaredFields()) {
+            for (Field field : SunUnsafe.getDeclaredFields()) {
                 if (field.getModifiers() == (Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL) && field.getType() == SunUnsafe) {
                     field.setAccessible(true);
 
@@ -900,15 +900,15 @@ public class Unsafe {
 
             theSunUnsafe = temporaryUnsafe;
 
-            final MethodHandles.Lookup lookup = MethodHandles.lookup();
+            MethodHandles.Lookup lookup = MethodHandles.lookup();
 
             trustedLookup = (MethodHandles.Lookup) (Object) lookup
                 .bind(temporaryUnsafe, "getObject", MethodType.methodType(Object.class, Object.class, long.class))
                 .invokeExact((Object) MethodHandles.Lookup.class, (long) lookup.bind(temporaryUnsafe, "staticFieldOffset", MethodType.methodType(long.class, Field.class))
                     .invokeExact(MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP")));
 
-            final String version = System.getProperty("java.version");
-            final boolean java9 = version.indexOf('.') != 1 || version.charAt(2) == '9';
+            String version = System.getProperty("java.version");
+            boolean java9 = version.indexOf('.') != 1 || version.charAt(2) == '9';
 
             if (java9) {
                 Unsafe = Class.forName("jdk.internal.misc.Unsafe");
@@ -1058,7 +1058,7 @@ public class Unsafe {
             ARRAY_OBJECT_INDEX_SCALE = arrayIndexScale(Object[].class);
 
             ADDRESS_SIZE = addressSize();
-        } catch (final Throwable throwable) {
+        } catch (Throwable throwable) {
             throw throwException(throwable);
         }
     }
