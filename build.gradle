@@ -1,7 +1,6 @@
 plugins {
     id("java-library")
     id("maven-publish")
-    id("com.jfrog.artifactory").version("4.21.0")
 }
 
 sourceCompatibility = 8
@@ -35,21 +34,14 @@ publishing {
 
     repositories {
         mavenLocal()
-    }
-}
 
-artifactory {
-    publish {
-        contextUrl = "https://auoeke.jfrog.io/artifactory"
+        maven {
+            url = "https://auoeke.jfrog.io/artifactory/maven"
 
-        repository {
-            repoKey = "maven"
-            username = System.env["ARTIFACTORY_USERNAME"]
-            password = System.env["ARTIFACTORY_PASSWORD"]
-        }
-
-        defaults {
-            publications("maven")
+            credentials {
+                username = System.env["ARTIFACTORY_USERNAME"]
+                password = System.env["ARTIFACTORY_PASSWORD"]
+            }
         }
     }
 }
