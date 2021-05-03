@@ -7,7 +7,7 @@ sourceCompatibility = 8
 targetCompatibility = 8
 
 group("net.gudenau.lib")
-version("1.4.2")
+version("1.4.3")
 
 repositories {
     mavenCentral()
@@ -36,8 +36,8 @@ publishing {
             url = "https://auoeke.jfrog.io/artifactory/maven"
 
             credentials {
-                username = System.env["ARTIFACTORY_USERNAME"]
-                password = System.env["ARTIFACTORY_PASSWORD"]
+                username = System.properties["maven.username"]
+                password = System.properties["maven.password"]
             }
         }
     }

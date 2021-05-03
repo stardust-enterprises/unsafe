@@ -914,7 +914,7 @@ public class Unsafe {
                     .invokeExact(MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP")));
 
             String version = System.getProperty("java.version");
-            boolean java9 = version.indexOf('.') < 0;
+            boolean java9 = version.indexOf('.') != 1;
 
             if (java9) {
                 Unsafe = Class.forName("jdk.internal.misc.Unsafe");

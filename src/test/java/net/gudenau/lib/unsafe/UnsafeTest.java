@@ -18,18 +18,12 @@ public class UnsafeTest {
         try {
             Unsafe.throwException(new Throwable(message));
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
-
             if (throwable.getClass() == Throwable.class && throwable.getMessage() == message) {
-                System.out.println("success");
-
                 return;
             }
         }
 
-        System.out.println("failure");
-
-        System.exit(1);
+        throw new AssertionError();
     }
 
     @Test
