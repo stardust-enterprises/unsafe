@@ -1,10 +1,10 @@
 ```groovy
 repositories {
-    maven {url = "https://auoeke.jfrog.io/artifactory/maven"}
+    maven {url = "https://maven.auoeke.net"}
 }
 
 dependencies {
-    // see https://auoeke.jfrog.io/artifactory/maven/net/gudenau/lib for versions
+    // see https://maven.auoeke.net for versions
     implementation("net.gudenau.lib:unsafe:latest.release")
 }
 ```

@@ -93,7 +93,6 @@ public class Unsafe {
     private static final MethodHandle addressSize;
     private static final MethodHandle pageSize;
     private static final MethodHandle defineClass;
-    private static final MethodHandle defineAnonymousClass;
     private static final MethodHandle allocateInstance;
     private static final MethodHandle throwException;
     private static final MethodHandle compareAndSwapObject;
@@ -541,14 +540,6 @@ public class Unsafe {
         }
     }
 
-    public static <A> Class<A> defineAnonymousClass(Class<?> hostClass, byte[] data, Object[] cpPatches) {
-        try {
-            return (Class<A>) defineAnonymousClass.invokeExact(hostClass, data, cpPatches);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
     public static <T> Class<T> defineClass(String name, byte[] bytecode, int offset, int length, ClassLoader classLoader, ProtectionDomain protectionDomain) {
         try {
             return (Class<T>) defineClass.invokeExact(name, bytecode, offset, length, classLoader, protectionDomain);
@@ -889,7 +880,7 @@ public class Unsafe {
 
     static {
         try {
-            SunUnsafe = Class.forName("sun.misc.Unsafe");
+            SunUnsafe = sun.misc.Unsafe.class;
             Object temporaryUnsafe = null;
 
             for (Field field : SunUnsafe.getDeclaredFields()) {
@@ -906,24 +897,17 @@ public class Unsafe {
 
             theSunUnsafe = temporaryUnsafe;
 
-            MethodHandles.Lookup lookup = MethodHandles.lookup();
+            var lookup = MethodHandles.lookup();
 
             trustedLookup = (MethodHandles.Lookup) (Object) lookup
                 .bind(temporaryUnsafe, "getObject", MethodType.methodType(Object.class, Object.class, long.class))
                 .invokeExact((Object) MethodHandles.Lookup.class, (long) lookup.bind(temporaryUnsafe, "staticFieldOffset", MethodType.methodType(long.class, Field.class))
                     .invokeExact(MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP")));
 
-            String version = System.getProperty("java.version");
-            boolean java9 = version.indexOf('.') != 1;
+            var version = System.getProperty("java.version");
 
-            if (java9) {
-                Unsafe = Class.forName("jdk.internal.misc.Unsafe");
-                temporaryUnsafe = trustedLookup.findStatic(Unsafe, "getUnsafe", MethodType.methodType(Unsafe)).invoke();
-            } else {
-                Unsafe = SunUnsafe;
-            }
-
-            theUnsafe = temporaryUnsafe;
+            Unsafe = Class.forName("jdk.internal.misc.Unsafe");
+            theUnsafe = trustedLookup.findStatic(Unsafe, "getUnsafe", MethodType.methodType(Unsafe)).invoke();
 
             getObjectInt = bind("getInt", int.class, Object.class, long.class);
             getObjectObject = bind("getObject", Object.class, Object.class, long.class);
@@ -981,7 +965,6 @@ public class Unsafe {
             addressSize = bind("addressSize", int.class);
             pageSize = bind("pageSize", int.class);
             defineClass = bind("defineClass", Class.class, String.class, byte[].class, int.class, int.class, ClassLoader.class, ProtectionDomain.class);
-            defineAnonymousClass = bind("defineAnonymousClass", Class.class, Class.class, byte[].class, Object[].class);
             allocateInstance = bind("allocateInstance", Object.class, Class.class);
             throwException = bind("throwException", void.class, Throwable.class);
 
@@ -1005,28 +988,17 @@ public class Unsafe {
             putFloatVolatile = bind("putFloatVolatile", void.class, Object.class, long.class, float.class);
             putDoubleVolatile = bind("putDoubleVolatile", void.class, Object.class, long.class, double.class);
 
-            if (java9) {
-                compareAndSwapObject = bind("compareAndSetObject", boolean.class, Object.class, long.class, Object.class, Object.class);
-                compareAndSwapInt = bind("compareAndSetInt", boolean.class, Object.class, long.class, int.class, int.class);
-                compareAndSwapLong = bind("compareAndSetLong", boolean.class, Object.class, long.class, long.class, long.class);
+            compareAndSwapObject = bind("compareAndSetObject", boolean.class, Object.class, long.class, Object.class, Object.class);
+            compareAndSwapInt = bind("compareAndSetInt", boolean.class, Object.class, long.class, int.class, int.class);
+            compareAndSwapLong = bind("compareAndSetLong", boolean.class, Object.class, long.class, long.class, long.class);
 
-                MethodHandle putReferenceRelease = bindSilently("putReferenceRelease", void.class, Object.class, long.class, Object.class);
+            var putReferenceRelease = bindSilently("putReferenceRelease", void.class, Object.class, long.class, Object.class);
+            putOrderedObject = putReferenceRelease == null
+                ? bind("putObjectRelease", void.class, Object.class, long.class, Object.class)
+                : putReferenceRelease;
 
-                putOrderedObject = putReferenceRelease == null
-                    ? bind("putObjectRelease", void.class, Object.class, long.class, Object.class)
-                    : putReferenceRelease;
-
-                putOrderedInt = bind("putIntRelease", void.class, Object.class, long.class, int.class);
-                putOrderedLong = bind("putLongRelease", void.class, Object.class, long.class, long.class);
-            } else {
-                compareAndSwapObject = bind("compareAndSwapObject", boolean.class, Object.class, long.class, Object.class, Object.class);
-                compareAndSwapInt = bind("compareAndSwapInt", boolean.class, Object.class, long.class, int.class, int.class);
-                compareAndSwapLong = bind("compareAndSwapLong", boolean.class, Object.class, long.class, long.class, long.class);
-
-                putOrderedObject = trustedLookup.bind(theUnsafe, "putOrderedObject", MethodType.methodType(void.class, Object.class, long.class, Object.class));
-                putOrderedInt = trustedLookup.bind(theUnsafe, "putOrderedInt", MethodType.methodType(void.class, Object.class, long.class, int.class));
-                putOrderedLong = trustedLookup.bind(theUnsafe, "putOrderedLong", MethodType.methodType(void.class, Object.class, long.class, long.class));
-            }
+            putOrderedInt = bind("putIntRelease", void.class, Object.class, long.class, int.class);
+            putOrderedLong = bind("putLongRelease", void.class, Object.class, long.class, long.class);
 
             unpark = bind("unpark", void.class, Object.class);
             park = bind("park", void.class, boolean.class, long.class);

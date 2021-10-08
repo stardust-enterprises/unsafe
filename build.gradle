@@ -3,23 +3,20 @@ plugins {
     id("maven-publish")
 }
 
-sourceCompatibility = 8
-targetCompatibility = 8
+group = "net.gudenau.lib"
+version = "1.4.3"
 
-group("net.gudenau.lib")
-version("1.4.3")
+sourceCompatibility = 16
+targetCompatibility = 16
 
 repositories {
     mavenCentral()
+
+    maven {url = "https://maven.auoeke.net"}
 }
 
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:latest.release")
-}
-
-tasks[sourceSets.test.compileJavaTaskName].configure {
-    sourceCompatibility = 16
-    targetCompatibility = 16
 }
 
 publishing {
@@ -33,7 +30,7 @@ publishing {
         mavenLocal()
 
         maven {
-            url = "https://auoeke.jfrog.io/artifactory/maven"
+            url = "https://maven.auoeke.net"
 
             credentials {
                 username = System.properties["maven.username"]

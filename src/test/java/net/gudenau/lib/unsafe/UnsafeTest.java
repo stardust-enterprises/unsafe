@@ -18,9 +18,7 @@ public class UnsafeTest {
         try {
             Unsafe.throwException(new Throwable(message));
         } catch (Throwable throwable) {
-            if (throwable.getClass() == Throwable.class && throwable.getMessage() == message) {
-                return;
-            }
+            assert throwable.getClass() == Throwable.class && throwable.getMessage() == message;
         }
 
         throw new AssertionError();
