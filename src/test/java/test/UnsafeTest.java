@@ -1,5 +1,6 @@
-package net.gudenau.lib.unsafe;
+package test;
 
+import net.gudenau.lib.unsafe.Unsafe;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.annotation.Testable;
 
@@ -17,21 +18,10 @@ public class UnsafeTest {
 
         try {
             Unsafe.throwException(new Throwable(message));
+
+            throw new AssertionError();
         } catch (Throwable throwable) {
             assert throwable.getClass() == Throwable.class && throwable.getMessage() == message;
         }
-
-        throw new AssertionError();
-    }
-
-    @Test
-    public void memory() {
-        long address = Unsafe.allocateMemory(24);
-        Object[] box = {new Object() {}};
-
-        Unsafe.setMemory(address, 24, (byte) 123);
-        Unsafe.putAddress(address + 12, 8L * Unsafe.getInt(box, Unsafe.ARRAY_OBJECT_BASE_OFFSET));
-
-        assert Unsafe.getUncompressedObject(address + 12) == box[0];
     }
 }

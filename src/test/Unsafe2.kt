@@ -1,6 +1,6 @@
 @file:Suppress("UNCHECKED_CAST", "unused")
 
-package net.gudenau.lib.unsafe
+package test
 
 import java.lang.invoke.MethodHandle
 import java.lang.invoke.MethodHandles
@@ -645,24 +645,14 @@ object Unsafe2 {
         loadFence = bind("loadFence", Void::class.javaPrimitiveType)
         storeFence = bind("storeFence", Void::class.javaPrimitiveType)
         fullFence = bind("fullFence", Void::class.javaPrimitiveType)
-        invokeCleaner = bindSilent("invokeCleaner", Void::class.javaPrimitiveType!!, ByteBuffer::class.java)
+        invokeCleaner = bind("invokeCleaner", Void::class.javaPrimitiveType!!, ByteBuffer::class.java)
 
-        if (java9) {
-            compareAndSwapObject = bind("compareAndSetObject", Boolean::class.javaPrimitiveType, Object, long, Object, Object)
-            compareAndSwapInt = bind("compareAndSetInt", Boolean::class.javaPrimitiveType, Object, long, int, int)
-            compareAndSwapLong = bind("compareAndSetLong", Boolean::class.javaPrimitiveType, Object, long, long, long)
-            putOrderedObject = bindSilent("putReferenceRelease", Void::class.javaPrimitiveType!!, Object, long, Object)
-                    ?: bind("putObjectRelease", Void::class.javaPrimitiveType, Object, long, Object)
-            putOrderedInt = bind("putIntRelease", Void::class.javaPrimitiveType, Object, long, int)
-            putOrderedLong = bind("putLongRelease", Void::class.javaPrimitiveType, Object, long, long)
-        } else {
-            compareAndSwapObject = bind("compareAndSwapObject", Boolean::class.javaPrimitiveType, Object, long, Object, Object)
-            compareAndSwapInt = bind("compareAndSwapInt", Boolean::class.javaPrimitiveType, Object, long, int, int)
-            compareAndSwapLong = bind("compareAndSwapLong", Boolean::class.javaPrimitiveType, Object, long, long, long)
-            putOrderedObject = trustedLookup.bind(theUnsafe, "putOrderedObject", MethodType.methodType(Void::class.javaPrimitiveType, Object, long, Object))
-            putOrderedInt = trustedLookup.bind(theUnsafe, "putOrderedInt", MethodType.methodType(Void::class.javaPrimitiveType, Object, long, int))
-            putOrderedLong = trustedLookup.bind(theUnsafe, "putOrderedLong", MethodType.methodType(Void::class.javaPrimitiveType, Object, long, long))
-        }
+        compareAndSwapObject = bind("compareAndSetObject", Boolean::class.javaPrimitiveType, Object, long, Object, Object)
+        compareAndSwapInt = bind("compareAndSetInt", Boolean::class.javaPrimitiveType, Object, long, int, int)
+        compareAndSwapLong = bind("compareAndSetLong", Boolean::class.javaPrimitiveType, Object, long, long, long)
+        putOrderedObject = bindSilent("putReferenceRelease", Void::class.javaPrimitiveType!!, Object, long, Object) ?: bind("putObjectRelease", Void::class.javaPrimitiveType, Object, long, Object)
+        putOrderedInt = bind("putIntRelease", Void::class.javaPrimitiveType, Object, long, int)
+        putOrderedLong = bind("putLongRelease", Void::class.javaPrimitiveType, Object, long, long)
 
         ARRAY_BOOLEAN_BASE_OFFSET = arrayBaseOffset(BooleanArray::class.java)
         ARRAY_BYTE_BASE_OFFSET = arrayBaseOffset(byteArray)

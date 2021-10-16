@@ -4,7 +4,6 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 import java.util.logging.Logger;
@@ -14,7 +13,7 @@ public class Unsafe {
     public static final MethodHandles.Lookup trustedLookup;
     public static final Class<?> SunUnsafe;
     public static final Class<?> Unsafe;
-    public static final Object theSunUnsafe;
+    public static final sun.misc.Unsafe theSunUnsafe;
     public static final Object theUnsafe;
 
     public static final int ARRAY_BOOLEAN_BASE_OFFSET;
@@ -94,12 +93,11 @@ public class Unsafe {
     private static final MethodHandle pageSize;
     private static final MethodHandle defineClass;
     private static final MethodHandle allocateInstance;
-    private static final MethodHandle throwException;
-    private static final MethodHandle compareAndSwapObject;
+    private static final MethodHandle compareAndSwapReference;
     private static final MethodHandle compareAndSwapInt;
     private static final MethodHandle compareAndSwapLong;
-    private static final MethodHandle getObjectVolatile;
-    private static final MethodHandle putObjectVolatile;
+    private static final MethodHandle getReferenceVolatile;
+    private static final MethodHandle putReferenceVolatile;
     private static final MethodHandle getIntVolatile;
     private static final MethodHandle putIntVolatile;
     private static final MethodHandle getBooleanVolatile;
@@ -116,7 +114,7 @@ public class Unsafe {
     private static final MethodHandle putFloatVolatile;
     private static final MethodHandle getDoubleVolatile;
     private static final MethodHandle putDoubleVolatile;
-    private static final MethodHandle putOrderedObject;
+    private static final MethodHandle putOrderedReference;
     private static final MethodHandle putOrderedInt;
     private static final MethodHandle putOrderedLong;
     private static final MethodHandle unpark;
@@ -126,7 +124,7 @@ public class Unsafe {
     private static final MethodHandle getAndAddLong;
     private static final MethodHandle getAndSetInt;
     private static final MethodHandle getAndSetLong;
-    private static final MethodHandle getAndSetObject;
+    private static final MethodHandle getAndSetReference;
     private static final MethodHandle loadFence;
     private static final MethodHandle storeFence;
     private static final MethodHandle fullFence;
@@ -566,7 +564,7 @@ public class Unsafe {
 
     public static boolean compareAndSwapObject(Object o, long offset, Object expected, Object x) {
         try {
-            return (boolean) compareAndSwapObject.invokeExact(o, offset, expected, x);
+            return (boolean) compareAndSwapReference.invokeExact(o, offset, expected, x);
         } catch (Throwable throwable) {
             throw throwException(throwable);
         }
@@ -590,7 +588,7 @@ public class Unsafe {
 
     public static <T> T getObjectVolatile(Object object, long offset) {
         try {
-            return (T) getObjectVolatile.invokeExact(object, offset);
+            return (T) getReferenceVolatile.invokeExact(object, offset);
         } catch (Throwable throwable) {
             throw throwException(throwable);
         }
@@ -598,7 +596,7 @@ public class Unsafe {
 
     public static void putObjectVolatile(Object o, long offset, Object x) {
         try {
-            putObjectVolatile.invokeExact(o, offset, x);
+            putReferenceVolatile.invokeExact(o, offset, x);
         } catch (Throwable throwable) {
             throw throwException(throwable);
         }
@@ -734,7 +732,7 @@ public class Unsafe {
 
     public static void putOrderedObject(Object o, long offset, Object x) {
         try {
-            putOrderedObject.invokeExact(o, offset, x);
+            putOrderedReference.invokeExact(o, offset, x);
         } catch (Throwable throwable) {
             throw throwException(throwable);
         }
@@ -814,7 +812,7 @@ public class Unsafe {
 
     public static <T> T getAndSetObject(Object o, long offset, T newValue) {
         try {
-            return (T) getAndSetObject.invokeExact(o, offset, (Object) newValue);
+            return (T) getAndSetReference.invokeExact(o, offset, (Object) newValue);
         } catch (Throwable throwable) {
             throw throwException(throwable);
         }
@@ -852,65 +850,42 @@ public class Unsafe {
         }
     }
 
-    private static MethodHandle bindSilently(String method, Class<?> returnType, Class<?>... parameterTypes) {
-        try {
-            try {
-                return trustedLookup.bind(theUnsafe, method, MethodType.methodType(returnType, parameterTypes));
-            } catch (NoSuchMethodException exception) {
-                return trustedLookup.bind(theUnsafe, method, MethodType.methodType(returnType, parameterTypes));
-            }
-        } catch (Throwable throwable) {
-            return null;
-        }
-    }
-
-    private static MethodHandle bind(String method, Class<?> returnType, Class<?>... parameterTypes) {
+    private static MethodHandle bind(String method, String alternative, Class<?> returnType, Class<?>... parameterTypes) {
         try {
             try {
                 return trustedLookup.bind(theUnsafe, method, MethodType.methodType(returnType, parameterTypes));
             } catch (NoSuchMethodException exception) {
                 return trustedLookup.bind(theSunUnsafe, method, MethodType.methodType(returnType, parameterTypes));
             }
-        } catch (Throwable failed) {
-            Logger.getLogger("Unsafe").warning(String.format("Unable to access Unsafe method %s\n%s.", MethodType.methodType(returnType, parameterTypes), failed));
+        } catch (Throwable throwable) {
+            if (alternative == null) {
+                Logger.getLogger("Unsafe").warning("Unable to access Unsafe method %s%s.%n".formatted(method, MethodType.methodType(returnType, parameterTypes)));
+                throwable.printStackTrace();
 
-            return null;
+                return null;
+            }
+
+            return bind(method, null, returnType, parameterTypes);
         }
+    }
+
+    private static MethodHandle bind(String method, Class<?> returnType, Class<?>... parameterTypes) {
+        return bind(method, null, returnType, parameterTypes);
     }
 
     static {
         try {
             SunUnsafe = sun.misc.Unsafe.class;
-            Object temporaryUnsafe = null;
-
-            for (Field field : SunUnsafe.getDeclaredFields()) {
-                if (field.getModifiers() == (Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL) && field.getType() == SunUnsafe) {
-                    field.setAccessible(true);
-
-                    temporaryUnsafe = field.get(null);
-
-                    if (temporaryUnsafe != null) {
-                        break;
-                    }
-                }
-            }
-
-            theSunUnsafe = temporaryUnsafe;
-
-            var lookup = MethodHandles.lookup();
-
-            trustedLookup = (MethodHandles.Lookup) (Object) lookup
-                .bind(temporaryUnsafe, "getObject", MethodType.methodType(Object.class, Object.class, long.class))
-                .invokeExact((Object) MethodHandles.Lookup.class, (long) lookup.bind(temporaryUnsafe, "staticFieldOffset", MethodType.methodType(long.class, Field.class))
-                    .invokeExact(MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP")));
-
-            var version = System.getProperty("java.version");
+            var field = SunUnsafe.getDeclaredField("theUnsafe");
+            field.setAccessible(true);
+            theSunUnsafe = (sun.misc.Unsafe) field.get(null);
+            trustedLookup = (MethodHandles.Lookup) theSunUnsafe.getObject(MethodHandles.Lookup.class, theSunUnsafe.staticFieldOffset(MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP")));
 
             Unsafe = Class.forName("jdk.internal.misc.Unsafe");
             theUnsafe = trustedLookup.findStatic(Unsafe, "getUnsafe", MethodType.methodType(Unsafe)).invoke();
 
             getObjectInt = bind("getInt", int.class, Object.class, long.class);
-            getObjectObject = bind("getObject", Object.class, Object.class, long.class);
+            getObjectObject = bind("getReference", Object.class, Object.class, long.class);
             getObjectBoolean = bind("getBoolean", boolean.class, Object.class, long.class);
             getObjectByte = bind("getByte", byte.class, Object.class, long.class);
             getObjectShort = bind("getShort", short.class, Object.class, long.class);
@@ -920,7 +895,7 @@ public class Unsafe {
             getObjectDouble = bind("getDouble", double.class, Object.class, long.class);
 
             putObjectInt = bind("putInt", void.class, Object.class, long.class, int.class);
-            putObjectObject = bind("putObject", void.class, Object.class, long.class, Object.class);
+            putObjectObject = bind("putReference", void.class, Object.class, long.class, Object.class);
             putObjectBoolean = bind("putBoolean", void.class, Object.class, long.class, boolean.class);
             putObjectByte = bind("putByte", void.class, Object.class, long.class, byte.class);
             putObjectShort = bind("putShort", void.class, Object.class, long.class, short.class);
@@ -947,7 +922,7 @@ public class Unsafe {
             putDouble = bind("putDouble", void.class, long.class, double.class);
             putAddress = bind("putAddress", void.class, long.class, long.class);
 
-            getUncompressedObject = bindSilently("getUncompressedObject", Object.class, long.class);
+            getUncompressedObject = bind("getUncompressedObject", Object.class, long.class);
             allocateMemory = bind("allocateMemory", long.class, long.class);
             reallocateMemory = bind("reallocateMemory", long.class, long.class, long.class);
             setObjectMemory = bind("setMemory", void.class, Object.class, long.class, long.class, byte.class);
@@ -966,9 +941,8 @@ public class Unsafe {
             pageSize = bind("pageSize", int.class);
             defineClass = bind("defineClass", Class.class, String.class, byte[].class, int.class, int.class, ClassLoader.class, ProtectionDomain.class);
             allocateInstance = bind("allocateInstance", Object.class, Class.class);
-            throwException = bind("throwException", void.class, Throwable.class);
 
-            getObjectVolatile = bind("getObjectVolatile", Object.class, Object.class, long.class);
+            getReferenceVolatile = bind("getReferenceVolatile", Object.class, Object.class, long.class);
             getIntVolatile = bind("getIntVolatile", int.class, Object.class, long.class);
             getBooleanVolatile = bind("getBooleanVolatile", boolean.class, Object.class, long.class);
             getByteVolatile = bind("getByteVolatile", byte.class, Object.class, long.class);
@@ -978,7 +952,7 @@ public class Unsafe {
             getFloatVolatile = bind("getFloatVolatile", float.class, Object.class, long.class);
             getDoubleVolatile = bind("getDoubleVolatile", double.class, Object.class, long.class);
 
-            putObjectVolatile = bind("putObjectVolatile", void.class, Object.class, long.class, Object.class);
+            putReferenceVolatile = bind("putReferenceVolatile", void.class, Object.class, long.class, Object.class);
             putIntVolatile = bind("putIntVolatile", void.class, Object.class, long.class, int.class);
             putBooleanVolatile = bind("putBooleanVolatile", void.class, Object.class, long.class, boolean.class);
             putByteVolatile = bind("putByteVolatile", void.class, Object.class, long.class, byte.class);
@@ -988,15 +962,11 @@ public class Unsafe {
             putFloatVolatile = bind("putFloatVolatile", void.class, Object.class, long.class, float.class);
             putDoubleVolatile = bind("putDoubleVolatile", void.class, Object.class, long.class, double.class);
 
-            compareAndSwapObject = bind("compareAndSetObject", boolean.class, Object.class, long.class, Object.class, Object.class);
+            compareAndSwapReference = bind("compareAndSetReference", boolean.class, Object.class, long.class, Object.class, Object.class);
             compareAndSwapInt = bind("compareAndSetInt", boolean.class, Object.class, long.class, int.class, int.class);
             compareAndSwapLong = bind("compareAndSetLong", boolean.class, Object.class, long.class, long.class, long.class);
 
-            var putReferenceRelease = bindSilently("putReferenceRelease", void.class, Object.class, long.class, Object.class);
-            putOrderedObject = putReferenceRelease == null
-                ? bind("putObjectRelease", void.class, Object.class, long.class, Object.class)
-                : putReferenceRelease;
-
+            putOrderedReference = bind("putReferenceRelease", void.class, Object.class, long.class, Object.class);
             putOrderedInt = bind("putIntRelease", void.class, Object.class, long.class, int.class);
             putOrderedLong = bind("putLongRelease", void.class, Object.class, long.class, long.class);
 
@@ -1008,13 +978,13 @@ public class Unsafe {
             getAndAddLong = bind("getAndAddLong", long.class, Object.class, long.class, long.class);
             getAndSetInt = bind("getAndSetInt", int.class, Object.class, long.class, int.class);
             getAndSetLong = bind("getAndSetLong", long.class, Object.class, long.class, long.class);
-            getAndSetObject = bind("getAndSetObject", Object.class, Object.class, long.class, Object.class);
+            getAndSetReference = bind("getAndSetReference", Object.class, Object.class, long.class, Object.class);
 
             loadFence = bind("loadFence", void.class);
             storeFence = bind("storeFence", void.class);
             fullFence = bind("fullFence", void.class);
 
-            invokeCleaner = bindSilently("invokeCleaner", void.class, ByteBuffer.class);
+            invokeCleaner = bind("invokeCleaner", void.class, ByteBuffer.class);
 
             ARRAY_BOOLEAN_BASE_OFFSET = arrayBaseOffset(boolean[].class);
             ARRAY_BYTE_BASE_OFFSET = arrayBaseOffset(byte[].class);
