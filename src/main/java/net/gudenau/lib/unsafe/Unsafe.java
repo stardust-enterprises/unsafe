@@ -396,7 +396,7 @@ public class Unsafe {
 
     public static long getAddress(Object object, long address) {
         try {
-            return (long) getAddress.invokeExact(object, address);
+            return (long) getObjectAddress.invokeExact(object, address);
         } catch (Throwable throwable) {
             throw throwException(throwable);
         }
@@ -412,7 +412,7 @@ public class Unsafe {
 
     public static void putAddress(Object object, long address, long x) {
         try {
-            putAddress.invokeExact(object, address, x);
+            putObjectAddress.invokeExact(object, address, x);
         } catch (Throwable throwable) {
             throw throwException(throwable);
         }
