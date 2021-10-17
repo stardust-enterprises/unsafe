@@ -410,6 +410,14 @@ public class Unsafe {
         }
     }
 
+    public static void putAddress(Object object, long address, long x) {
+        try {
+            putAddress.invokeExact(object, address, x);
+        } catch (Throwable throwable) {
+            throw throwException(throwable);
+        }
+    }
+
     public static <T> T getUncompressedObject(long address) {
         try {
             return (T) getUncompressedObject.invokeExact(address);
