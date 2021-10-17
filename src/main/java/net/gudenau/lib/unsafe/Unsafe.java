@@ -73,7 +73,9 @@ public class Unsafe {
     private static final MethodHandle getDouble;
     private static final MethodHandle putDouble;
     private static final MethodHandle getAddress;
+    private static final MethodHandle getObjectAddress;
     private static final MethodHandle putAddress;
+    private static final MethodHandle putObjectAddress;
     private static final MethodHandle getUncompressedObject;
     private static final MethodHandle allocateMemory;
     private static final MethodHandle reallocateMemory;
@@ -117,8 +119,6 @@ public class Unsafe {
     private static final MethodHandle putOrderedReference;
     private static final MethodHandle putOrderedInt;
     private static final MethodHandle putOrderedLong;
-    private static final MethodHandle unpark;
-    private static final MethodHandle park;
     private static final MethodHandle getLoadAverage;
     private static final MethodHandle getAndAddInt;
     private static final MethodHandle getAndAddLong;
@@ -389,6 +389,14 @@ public class Unsafe {
     public static long getAddress(long address) {
         try {
             return (long) getAddress.invokeExact(address);
+        } catch (Throwable throwable) {
+            throw throwException(throwable);
+        }
+    }
+
+    public static long getAddress(Object object, long address) {
+        try {
+            return (long) getAddress.invokeExact(object, address);
         } catch (Throwable throwable) {
             throw throwException(throwable);
         }
@@ -753,23 +761,6 @@ public class Unsafe {
             throw throwException(throwable);
         }
     }
-
-    public static void unpark(Object thread) {
-        try {
-            unpark.invokeExact(thread);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static void park(boolean isAbsolute, long time) {
-        try {
-            park.invokeExact(isAbsolute, time);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
     public static int getLoadAverage(double[] loadavg, int nelems) {
         try {
             return (int) getLoadAverage.invokeExact(loadavg, nelems);
@@ -912,6 +903,7 @@ public class Unsafe {
             getFloat = bind("getFloat", float.class, long.class);
             getDouble = bind("getDouble", double.class, long.class);
             getAddress = bind("getAddress", long.class, long.class);
+            getObjectAddress = bind("getAddress", long.class, Object.class, long.class);
 
             putByte = bind("putByte", void.class, long.class, byte.class);
             putShort = bind("putShort", void.class, long.class, short.class);
@@ -921,6 +913,7 @@ public class Unsafe {
             putFloat = bind("putFloat", void.class, long.class, float.class);
             putDouble = bind("putDouble", void.class, long.class, double.class);
             putAddress = bind("putAddress", void.class, long.class, long.class);
+            putObjectAddress = bind("putAddress", void.class, Object.class, long.class, long.class);
 
             getUncompressedObject = bind("getUncompressedObject", Object.class, long.class);
             allocateMemory = bind("allocateMemory", long.class, long.class);
@@ -969,9 +962,6 @@ public class Unsafe {
             putOrderedReference = bind("putReferenceRelease", void.class, Object.class, long.class, Object.class);
             putOrderedInt = bind("putIntRelease", void.class, Object.class, long.class, int.class);
             putOrderedLong = bind("putLongRelease", void.class, Object.class, long.class, long.class);
-
-            unpark = bind("unpark", void.class, Object.class);
-            park = bind("park", void.class, boolean.class, long.class);
 
             getLoadAverage = bind("getLoadAverage", int.class, double[].class, int.class);
             getAndAddInt = bind("getAndAddInt", int.class, Object.class, long.class, int.class);
