@@ -42,8 +42,8 @@ public class Unsafe {
 
     private static final MethodHandle getObjectInt;
     private static final MethodHandle putObjectInt;
-    private static final MethodHandle getObjectObject;
-    private static final MethodHandle putObjectObject;
+    private static final MethodHandle getObjectReference;
+    private static final MethodHandle putObjectReference;
     private static final MethodHandle getObjectBoolean;
     private static final MethodHandle putObjectBoolean;
     private static final MethodHandle getObjectByte;
@@ -131,719 +131,409 @@ public class Unsafe {
     private static final MethodHandle invokeCleaner;
 
     public static int getInt(Object o, long offset) {
-        try {
-            return (int) getObjectInt.invokeExact(o, offset);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (int) getObjectInt.invokeExact(o, offset));
     }
 
     public static void putInt(Object o, long offset, int x) {
-        try {
-            putObjectInt.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> putObjectInt.invokeExact(o, offset, x));
     }
 
+    @Deprecated(forRemoval = true)
     public static <T> T getObject(Object o, long offset) {
-        try {
-            return (T) getObjectObject.invokeExact(o, offset);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (T) getObjectReference.invokeExact(o, offset));
     }
 
+    @Deprecated(forRemoval = true)
     public static void putObject(Object o, long offset, Object x) {
-        try {
-            putObjectObject.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> putObjectReference.invokeExact(o, offset, x));
+    }
+
+    public static <T> T getReference(Object o, long offset) {
+        return get(() -> (T) getObjectReference.invokeExact(o, offset));
+    }
+
+    public static void putReference(Object o, long offset, Object x) {
+        run(() -> putObjectReference.invokeExact(o, offset, x));
     }
 
     public static boolean getBoolean(Object o, long offset) {
-        try {
-            return (boolean) getObjectBoolean.invokeExact(o, offset);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (boolean) getObjectBoolean.invokeExact(o, offset));
     }
 
     public static void putBoolean(Object o, long offset, boolean x) {
-        try {
-            putObjectBoolean.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> putObjectBoolean.invokeExact(o, offset, x));
     }
 
     public static byte getByte(Object o, long offset) {
-        try {
-            return (byte) getObjectByte.invokeExact(o, offset);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (byte) getObjectByte.invokeExact(o, offset));
     }
 
     public static void putByte(Object o, long offset, byte x) {
-        try {
-            putObjectByte.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> putObjectByte.invokeExact(o, offset, x));
     }
 
     public static short getShort(Object o, long offset) {
-        try {
-            return (short) getObjectShort.invokeExact(o, offset);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (short) getObjectShort.invokeExact(o, offset));
     }
 
     public static void putShort(Object o, long offset, short x) {
-        try {
-            putObjectShort.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> putObjectShort.invokeExact(o, offset, x));
     }
 
     public static char getChar(Object o, long offset) {
-        try {
-            return (char) getObjectChar.invokeExact(o, offset);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (char) getObjectChar.invokeExact(o, offset));
     }
 
     public static void putChar(Object o, long offset, char x) {
-        try {
-            putObjectChar.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> putObjectChar.invokeExact(o, offset, x));
     }
 
     public static long getLong(Object o, long offset) {
-        try {
-            return (long) getObjectLong.invokeExact(o, offset);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (long) getObjectLong.invokeExact(o, offset));
     }
 
     public static void putLong(Object o, long offset, long x) {
-        try {
-            putObjectLong.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> putObjectLong.invokeExact(o, offset, x));
     }
 
     public static float getFloat(Object o, long offset) {
-        try {
-            return (float) getObjectFloat.invokeExact(o, offset);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (float) getObjectFloat.invokeExact(o, offset));
     }
 
     public static void putFloat(Object o, long offset, float x) {
-        try {
-            putObjectFloat.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> putObjectFloat.invokeExact(o, offset, x));
     }
 
     public static double getDouble(Object o, long offset) {
-        try {
-            return (double) getObjectDouble.invokeExact(o, offset);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (double) getObjectDouble.invokeExact(o, offset));
     }
 
     public static void putDouble(Object o, long offset, double x) {
-        try {
-            putObjectDouble.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> putObjectDouble.invokeExact(o, offset, x));
     }
 
     public static byte getByte(long address) {
-        try {
-            return (byte) getByte.invokeExact(address);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (byte) getByte.invokeExact(address));
     }
 
     public static void putByte(long address, byte x) {
-        try {
-            putByte.invokeExact(address, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> putByte.invokeExact(address, x));
     }
 
     public static short getShort(long address) {
-        try {
-            return (short) getShort.invokeExact(address);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (short) getShort.invokeExact(address));
     }
 
     public static void putShort(long address, short x) {
-        try {
-            putShort.invokeExact(address, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> putShort.invokeExact(address, x));
     }
 
     public static char getChar(long address) {
-        try {
-            return (char) getChar.invokeExact(address);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (char) getChar.invokeExact(address));
     }
 
     public static void putChar(long address, char x) {
-        try {
-            putChar.invokeExact(address, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> putChar.invokeExact(address, x));
     }
 
     public static int getInt(long address) {
-        try {
-            return (int) getInt.invokeExact(address);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (int) getInt.invokeExact(address));
     }
 
     public static void putInt(long address, int x) {
-        try {
-            putInt.invokeExact(address, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> putInt.invokeExact(address, x));
     }
 
     public static long getLong(long address) {
-        try {
-            return (long) getLong.invokeExact(address);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (long) getLong.invokeExact(address));
     }
 
     public static void putLong(long address, long x) {
-        try {
-            putLong.invokeExact(address, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> putLong.invokeExact(address, x));
     }
 
     public static float getFloat(long address) {
-        try {
-            return (float) getFloat.invokeExact(address);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (float) getFloat.invokeExact(address));
     }
 
     public static void putFloat(long address, float x) {
-        try {
-            putFloat.invokeExact(address, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> putFloat.invokeExact(address, x));
     }
 
     public static double getDouble(long address) {
-        try {
-            return (double) getDouble.invokeExact(address);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (double) getDouble.invokeExact(address));
     }
 
     public static void putDouble(long address, double x) {
-        try {
-            putDouble.invokeExact(address, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> putDouble.invokeExact(address, x));
     }
 
     public static long getAddress(long address) {
-        try {
-            return (long) getAddress.invokeExact(address);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (long) getAddress.invokeExact(address));
     }
 
     public static long getAddress(Object object, long address) {
-        try {
-            return (long) getObjectAddress.invokeExact(object, address);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (long) getObjectAddress.invokeExact(object, address));
     }
 
     public static void putAddress(long address, long x) {
-        try {
-            putAddress.invokeExact(address, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> putAddress.invokeExact(address, x));
     }
 
     public static void putAddress(Object object, long address, long x) {
-        try {
-            putObjectAddress.invokeExact(object, address, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> putObjectAddress.invokeExact(object, address, x));
     }
 
     public static <T> T getUncompressedObject(long address) {
-        try {
-            return (T) getUncompressedObject.invokeExact(address);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (T) getUncompressedObject.invokeExact(address));
     }
 
     public static long allocateMemory(long bytes) {
-        try {
-            return (long) allocateMemory.invokeExact(bytes);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (long) allocateMemory.invokeExact(bytes));
     }
 
     public static long reallocateMemory(long address, long bytes) {
-        try {
-            return (long) reallocateMemory.invokeExact(address, bytes);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (long) reallocateMemory.invokeExact(address, bytes));
     }
 
     public static void setMemory(Object o, long offset, long bytes, byte value) {
-        try {
-            setObjectMemory.invokeExact(o, offset, bytes, value);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> setObjectMemory.invokeExact(o, offset, bytes, value));
     }
 
     public static void setMemory(long address, long bytes, byte value) {
-        try {
-            setMemory.invokeExact(address, bytes, value);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> setMemory.invokeExact(address, bytes, value));
     }
 
     public static void copyMemory(Object srcBase, long srcOffset, Object destBase, long destOffset, long bytes) {
-        try {
-            copyObjectMemory.invokeExact(srcBase, srcOffset, destBase, destOffset, bytes);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> copyObjectMemory.invokeExact(srcBase, srcOffset, destBase, destOffset, bytes));
     }
 
     public static void copyMemory(long srcAddress, long destAddress, long bytes) {
-        try {
-            copyMemory.invokeExact(srcAddress, destAddress, bytes);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> copyMemory.invokeExact(srcAddress, destAddress, bytes));
     }
 
     public static void freeMemory(long address) {
-        try {
-            freeMemory.invokeExact(address);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> freeMemory.invokeExact(address));
     }
 
     public static long objectFieldOffset(Field field) {
-        try {
-            return (long) objectFieldOffset.invokeExact(field);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (long) objectFieldOffset.invokeExact(field));
     }
 
     public static long staticFieldOffset(Field field) {
-        try {
-            return (long) staticFieldOffset.invokeExact(field);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (long) staticFieldOffset.invokeExact(field));
     }
 
     public static Object staticFieldBase(Field field) {
-        try {
-            return (Object) staticFieldBase.invokeExact(field);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (Object) staticFieldBase.invokeExact(field));
     }
 
     public static boolean shouldBeInitialized(Class<?> klass) {
-        try {
-            return (boolean) shouldBeInitialized.invokeExact(klass);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (boolean) shouldBeInitialized.invokeExact(klass));
     }
 
     public static void ensureClassInitialized(Class<?> c) {
-        try {
-            ensureClassInitialized.invokeExact(c);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        run(() -> ensureClassInitialized.invokeExact(c));
     }
 
     public static int arrayBaseOffset(Class<?> arrayClass) {
-        try {
-            return (int) arrayBaseOffset.invokeExact(arrayClass);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (int) arrayBaseOffset.invokeExact(arrayClass));
     }
 
     public static <T> int arrayIndexScale(Class<T> arrayClass) {
-        try {
-            return (int) arrayIndexScale.invokeExact(arrayClass);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (int) arrayIndexScale.invokeExact(arrayClass));
     }
 
     public static int addressSize() {
-        try {
-            return (int) addressSize.invokeExact();
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (int) addressSize.invokeExact());
     }
 
     public static int pageSize() {
-        try {
-            return (int) pageSize.invokeExact();
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (int) pageSize.invokeExact());
     }
 
     public static <T> Class<T> defineClass(String name, byte[] bytecode, int offset, int length, ClassLoader classLoader, ProtectionDomain protectionDomain) {
-        try {
-            return (Class<T>) defineClass.invokeExact(name, bytecode, offset, length, classLoader, protectionDomain);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (Class<T>) defineClass.invokeExact(name, bytecode, offset, length, classLoader, protectionDomain));
     }
 
     public static <T> T allocateInstance(Class<T> cls) {
-        try {
-            return (T) allocateInstance.invokeExact(cls);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
+        return get(() -> (T) allocateInstance.invokeExact(cls));
     }
 
     public static RuntimeException throwException(Throwable throwable) {
         return throw0(throwable);
     }
 
+    public static boolean compareAndSwapObject(Object o, long offset, Object expected, Object x) {
+        return get(() -> (boolean) compareAndSwapReference.invokeExact(o, offset, expected, x));
+    }
+
+    public static boolean compareAndSwapInt(Object o, long offset, int expected, int x) {
+        return get(() -> (boolean) compareAndSwapInt.invokeExact(o, offset, expected, x));
+    }
+
+    public static boolean compareAndSwapLong(Object object, long offset, long expected, long x) {
+        return get(() -> (boolean) compareAndSwapLong.invokeExact(object, offset, expected, x));
+    }
+
+    @Deprecated(forRemoval = true)
+    public static <T> T getObjectVolatile(Object object, long offset) {
+        return getReferenceVolatile(object, offset);
+    }
+
+    @Deprecated(forRemoval = true)
+    public static void putObjectVolatile(Object o, long offset, Object x) {
+        putReferenceVolatile(o, offset, x);
+    }
+
+    public static <T> T getReferenceVolatile(Object object, long offset) {
+        return get(() -> (T) getReferenceVolatile.invokeExact(object, offset));
+    }
+
+    public static void putReferenceVolatile(Object o, long offset, Object x) {
+        run(() -> putReferenceVolatile.invokeExact(o, offset, x));
+    }
+
+    public static int getIntVolatile(Object o, long offset) {
+        return get(() -> (int) getIntVolatile.invokeExact(o, offset));
+    }
+
+    public static void putIntVolatile(Object o, long offset, int x) {
+        run(() -> putIntVolatile.invokeExact(o, offset, x));
+    }
+
+    public static boolean getBooleanVolatile(Object o, long offset) {
+        return get(() -> (boolean) getBooleanVolatile.invokeExact(o, offset));
+    }
+
+    public static void putBooleanVolatile(Object o, long offset, boolean x) {
+        run(() -> putBooleanVolatile.invokeExact(o, offset, x));
+    }
+
+    public static byte getByteVolatile(Object o, long offset) {
+        return get(() -> (byte) getByteVolatile.invokeExact(o, offset));
+    }
+
+    public static void putByteVolatile(Object o, long offset, byte x) {
+        run(() -> putByteVolatile.invokeExact(o, offset, x));
+    }
+
+    public static short getShortVolatile(Object o, long offset) {
+        return get(() -> (short) getShortVolatile.invokeExact(o, offset));
+    }
+
+    public static void putShortVolatile(Object o, long offset, short x) {
+        run(() -> putShortVolatile.invokeExact(o, offset, x));
+    }
+
+    public static char getCharVolatile(Object o, long offset) {
+        return get(() -> (char) getCharVolatile.invokeExact(o, offset));
+    }
+
+    public static void putCharVolatile(Object o, long offset, char x) {
+        run(() -> putCharVolatile.invokeExact(o, offset, x));
+    }
+
+    public static long getLongVolatile(Object o, long offset) {
+        return get(() -> (long) getLongVolatile.invokeExact(o, offset));
+    }
+
+    public static void putLongVolatile(Object o, long offset, long x) {
+        run(() -> putLongVolatile.invokeExact(o, offset, x));
+    }
+
+    public static float getFloatVolatile(Object o, long offset) {
+        return get(() -> (float) getFloatVolatile.invokeExact(o, offset));
+    }
+
+    public static void putFloatVolatile(Object o, long offset, float x) {
+        run(() -> putFloatVolatile.invokeExact(o, offset, x));
+    }
+
+    public static double getDoubleVolatile(Object o, long offset) {
+        return get(() -> (double) getDoubleVolatile.invokeExact(o, offset));
+    }
+
+    public static void putDoubleVolatile(Object o, long offset, double x) {
+        run(() -> putDoubleVolatile.invokeExact(o, offset, x));
+    }
+
+    @Deprecated(forRemoval = true)
+    public static void putOrderedObject(Object o, long offset, Object x) {
+        putOrderedReference(o, offset, x);
+    }
+
+    public static void putOrderedReference(Object o, long offset, Object x) {
+        run(() -> putOrderedReference.invokeExact(o, offset, x));
+    }
+
+    public static void putOrderedInt(Object o, long offset, int x) {
+        run(() -> putOrderedInt.invokeExact(o, offset, x));
+    }
+
+    public static void putOrderedLong(Object o, long offset, long x) {
+        run(() -> putOrderedLong.invokeExact(o, offset, x));
+    }
+
+    public static int getLoadAverage(double[] loadavg, int nelems) {
+        return get(() -> (int) getLoadAverage.invokeExact(loadavg, nelems));
+    }
+    public static int getAndAddInt(Object o, long offset, int delta) {
+        return get(() -> (int) getAndAddInt.invokeExact(o, offset, delta));
+    }
+
+    public static long getAndAddLong(Object o, long offset, long delta) {
+        return get(() -> (long) getAndAddLong.invokeExact(o, offset, delta));
+    }
+
+    public static int getAndSetInt(Object o, long offset, int newValue) {
+        return get(() -> (int) getAndSetInt.invokeExact(o, offset, newValue));
+    }
+
+    public static long getAndSetLong(Object o, long offset, long newValue) {
+        return get(() -> (long) getAndSetLong.invokeExact(o, offset, newValue));
+    }
+
+    @Deprecated(forRemoval = true)
+    public static <T> T getAndSetObject(Object o, long offset, T newValue) {
+        return getAndSetReference(o, offset, newValue);
+    }
+
+    public static <T> T getAndSetReference(Object o, long offset, T newValue) {
+        return get(() -> (T) getAndSetReference.invokeExact(o, offset, (Object) newValue));
+    }
+
+    public static void loadFence() {
+        run(loadFence::invokeExact);
+    }
+
+    public static void storeFence() {
+        run(storeFence::invokeExact);
+    }
+
+    public static void fullFence() {
+        run (fullFence::invokeExact);
+    }
+
+    public static void invokeCleaner(ByteBuffer directBuffer) {
+        run(() -> invokeCleaner.invokeExact(directBuffer));
+    }
+
     private static <T extends Throwable> T throw0(Throwable throwable) throws T {
         throw (T) throwable;
     }
 
-    public static boolean compareAndSwapObject(Object o, long offset, Object expected, Object x) {
+    private static void run(Runnable runnable) {
         try {
-            return (boolean) compareAndSwapReference.invokeExact(o, offset, expected, x);
+            runnable.run();
         } catch (Throwable throwable) {
             throw throwException(throwable);
         }
     }
 
-    public static boolean compareAndSwapInt(Object o, long offset, int expected, int x) {
+    private static <T> T get(Supplier<T> supplier) {
         try {
-            return (boolean) compareAndSwapInt.invokeExact(o, offset, expected, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static boolean compareAndSwapLong(Object object, long offset, long expected, long x) {
-        try {
-            return (boolean) compareAndSwapLong.invokeExact(object, offset, expected, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static <T> T getObjectVolatile(Object object, long offset) {
-        try {
-            return (T) getReferenceVolatile.invokeExact(object, offset);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static void putObjectVolatile(Object o, long offset, Object x) {
-        try {
-            putReferenceVolatile.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static int getIntVolatile(Object o, long offset) {
-        try {
-            return (int) getIntVolatile.invokeExact(o, offset);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static void putIntVolatile(Object o, long offset, int x) {
-        try {
-            putIntVolatile.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static boolean getBooleanVolatile(Object o, long offset) {
-        try {
-            return (boolean) getBooleanVolatile.invokeExact(o, offset);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static void putBooleanVolatile(Object o, long offset, boolean x) {
-        try {
-            putBooleanVolatile.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static byte getByteVolatile(Object o, long offset) {
-        try {
-            return (byte) getByteVolatile.invokeExact(o, offset);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static void putByteVolatile(Object o, long offset, byte x) {
-        try {
-            putByteVolatile.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static short getShortVolatile(Object o, long offset) {
-        try {
-            return (short) getShortVolatile.invokeExact(o, offset);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static void putShortVolatile(Object o, long offset, short x) {
-        try {
-            putShortVolatile.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static char getCharVolatile(Object o, long offset) {
-        try {
-            return (char) getCharVolatile.invokeExact(o, offset);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static void putCharVolatile(Object o, long offset, char x) {
-        try {
-            putCharVolatile.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static long getLongVolatile(Object o, long offset) {
-        try {
-            return (long) getLongVolatile.invokeExact(o, offset);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static void putLongVolatile(Object o, long offset, long x) {
-        try {
-            putLongVolatile.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static float getFloatVolatile(Object o, long offset) {
-        try {
-            return (float) getFloatVolatile.invokeExact(o, offset);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static void putFloatVolatile(Object o, long offset, float x) {
-        try {
-            putFloatVolatile.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static double getDoubleVolatile(Object o, long offset) {
-        try {
-            return (double) getDoubleVolatile.invokeExact(o, offset);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static void putDoubleVolatile(Object o, long offset, double x) {
-        try {
-            putDoubleVolatile.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static void putOrderedObject(Object o, long offset, Object x) {
-        try {
-            putOrderedReference.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static void putOrderedInt(Object o, long offset, int x) {
-        try {
-            putOrderedInt.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static void putOrderedLong(Object o, long offset, long x) {
-        try {
-            putOrderedLong.invokeExact(o, offset, x);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-    public static int getLoadAverage(double[] loadavg, int nelems) {
-        try {
-            return (int) getLoadAverage.invokeExact(loadavg, nelems);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static int getAndAddInt(Object o, long offset, int delta) {
-        try {
-            return (int) getAndAddInt.invokeExact(o, offset, delta);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static long getAndAddLong(Object o, long offset, long delta) {
-        try {
-            return (long) getAndAddLong.invokeExact(o, offset, delta);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static int getAndSetInt(Object o, long offset, int newValue) {
-        try {
-            return (int) getAndSetInt.invokeExact(o, offset, newValue);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static long getAndSetLong(Object o, long offset, long newValue) {
-        try {
-            return (long) getAndSetLong.invokeExact(o, offset, newValue);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static <T> T getAndSetObject(Object o, long offset, T newValue) {
-        try {
-            return (T) getAndSetReference.invokeExact(o, offset, (Object) newValue);
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static void loadFence() {
-        try {
-            loadFence.invokeExact();
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static void storeFence() {
-        try {
-            storeFence.invokeExact();
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static void fullFence() {
-        try {
-            fullFence.invokeExact();
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    public static void invokeCleaner(ByteBuffer directBuffer) {
-        try {
-            invokeCleaner.invokeExact(directBuffer);
+            return supplier.get();
         } catch (Throwable throwable) {
             throw throwException(throwable);
         }
@@ -872,6 +562,14 @@ public class Unsafe {
         return bind(method, null, returnType, parameterTypes);
     }
 
+    private interface Runnable {
+        void run() throws Throwable;
+    }
+
+    private interface Supplier<T> {
+        T get() throws Throwable;
+    }
+
     static {
         try {
             SunUnsafe = sun.misc.Unsafe.class;
@@ -884,7 +582,7 @@ public class Unsafe {
             theUnsafe = trustedLookup.findStatic(Unsafe, "getUnsafe", MethodType.methodType(Unsafe)).invoke();
 
             getObjectInt = bind("getInt", int.class, Object.class, long.class);
-            getObjectObject = bind("getReference", Object.class, Object.class, long.class);
+            getObjectReference = bind("getReference", Object.class, Object.class, long.class);
             getObjectBoolean = bind("getBoolean", boolean.class, Object.class, long.class);
             getObjectByte = bind("getByte", byte.class, Object.class, long.class);
             getObjectShort = bind("getShort", short.class, Object.class, long.class);
@@ -894,7 +592,7 @@ public class Unsafe {
             getObjectDouble = bind("getDouble", double.class, Object.class, long.class);
 
             putObjectInt = bind("putInt", void.class, Object.class, long.class, int.class);
-            putObjectObject = bind("putReference", void.class, Object.class, long.class, Object.class);
+            putObjectReference = bind("putReference", void.class, Object.class, long.class, Object.class);
             putObjectBoolean = bind("putBoolean", void.class, Object.class, long.class, boolean.class);
             putObjectByte = bind("putByte", void.class, Object.class, long.class, byte.class);
             putObjectShort = bind("putShort", void.class, Object.class, long.class, short.class);
