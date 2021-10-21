@@ -8,10 +8,10 @@ import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 import java.util.logging.Logger;
 
-@SuppressWarnings({"unchecked", "unused", "RedundantSuppression", "ConstantConditions", "SameParameterValue"})
+@SuppressWarnings({"unchecked", "unused", "RedundantSuppression", "ConstantConditions", "SameParameterValue", "CodeBlock2Expr", "Convert2MethodRef"})
 public class Unsafe {
     public static final MethodHandles.Lookup trustedLookup;
-    public static final Class<?> SunUnsafe;
+    public static final Class<?> SunUnsafe = sun.misc.Unsafe.class;
     public static final Class<?> Unsafe;
     public static final sun.misc.Unsafe theSunUnsafe;
     public static final Object theUnsafe;
@@ -135,7 +135,7 @@ public class Unsafe {
     }
 
     public static void putInt(Object o, long offset, int x) {
-        run(() -> putObjectInt.invokeExact(o, offset, x));
+        run(() -> {putObjectInt.invokeExact(o, offset, x);});
     }
 
     @Deprecated(forRemoval = true)
@@ -145,7 +145,7 @@ public class Unsafe {
 
     @Deprecated(forRemoval = true)
     public static void putObject(Object o, long offset, Object x) {
-        run(() -> putObjectReference.invokeExact(o, offset, x));
+        run(() -> {putObjectReference.invokeExact(o, offset, x);});
     }
 
     public static <T> T getReference(Object o, long offset) {
@@ -153,7 +153,7 @@ public class Unsafe {
     }
 
     public static void putReference(Object o, long offset, Object x) {
-        run(() -> putObjectReference.invokeExact(o, offset, x));
+        run(() -> {putObjectReference.invokeExact(o, offset, x);});
     }
 
     public static boolean getBoolean(Object o, long offset) {
@@ -161,7 +161,7 @@ public class Unsafe {
     }
 
     public static void putBoolean(Object o, long offset, boolean x) {
-        run(() -> putObjectBoolean.invokeExact(o, offset, x));
+        run(() -> {putObjectBoolean.invokeExact(o, offset, x);});
     }
 
     public static byte getByte(Object o, long offset) {
@@ -169,7 +169,7 @@ public class Unsafe {
     }
 
     public static void putByte(Object o, long offset, byte x) {
-        run(() -> putObjectByte.invokeExact(o, offset, x));
+        run(() -> {putObjectByte.invokeExact(o, offset, x);});
     }
 
     public static short getShort(Object o, long offset) {
@@ -177,7 +177,7 @@ public class Unsafe {
     }
 
     public static void putShort(Object o, long offset, short x) {
-        run(() -> putObjectShort.invokeExact(o, offset, x));
+        run(() -> {putObjectShort.invokeExact(o, offset, x);});
     }
 
     public static char getChar(Object o, long offset) {
@@ -185,7 +185,7 @@ public class Unsafe {
     }
 
     public static void putChar(Object o, long offset, char x) {
-        run(() -> putObjectChar.invokeExact(o, offset, x));
+        run(() -> {putObjectChar.invokeExact(o, offset, x);});
     }
 
     public static long getLong(Object o, long offset) {
@@ -193,7 +193,7 @@ public class Unsafe {
     }
 
     public static void putLong(Object o, long offset, long x) {
-        run(() -> putObjectLong.invokeExact(o, offset, x));
+        run(() -> {putObjectLong.invokeExact(o, offset, x);});
     }
 
     public static float getFloat(Object o, long offset) {
@@ -201,7 +201,7 @@ public class Unsafe {
     }
 
     public static void putFloat(Object o, long offset, float x) {
-        run(() -> putObjectFloat.invokeExact(o, offset, x));
+        run(() -> {putObjectFloat.invokeExact(o, offset, x);});
     }
 
     public static double getDouble(Object o, long offset) {
@@ -209,7 +209,7 @@ public class Unsafe {
     }
 
     public static void putDouble(Object o, long offset, double x) {
-        run(() -> putObjectDouble.invokeExact(o, offset, x));
+        run(() -> {putObjectDouble.invokeExact(o, offset, x);});
     }
 
     public static byte getByte(long address) {
@@ -217,7 +217,7 @@ public class Unsafe {
     }
 
     public static void putByte(long address, byte x) {
-        run(() -> putByte.invokeExact(address, x));
+        run(() -> {putByte.invokeExact(address, x);});
     }
 
     public static short getShort(long address) {
@@ -225,7 +225,7 @@ public class Unsafe {
     }
 
     public static void putShort(long address, short x) {
-        run(() -> putShort.invokeExact(address, x));
+        run(() -> {putShort.invokeExact(address, x);});
     }
 
     public static char getChar(long address) {
@@ -233,7 +233,7 @@ public class Unsafe {
     }
 
     public static void putChar(long address, char x) {
-        run(() -> putChar.invokeExact(address, x));
+        run(() -> {putChar.invokeExact(address, x);});
     }
 
     public static int getInt(long address) {
@@ -241,7 +241,7 @@ public class Unsafe {
     }
 
     public static void putInt(long address, int x) {
-        run(() -> putInt.invokeExact(address, x));
+        run(() -> {putInt.invokeExact(address, x);});
     }
 
     public static long getLong(long address) {
@@ -249,7 +249,7 @@ public class Unsafe {
     }
 
     public static void putLong(long address, long x) {
-        run(() -> putLong.invokeExact(address, x));
+        run(() -> {putLong.invokeExact(address, x);});
     }
 
     public static float getFloat(long address) {
@@ -257,7 +257,7 @@ public class Unsafe {
     }
 
     public static void putFloat(long address, float x) {
-        run(() -> putFloat.invokeExact(address, x));
+        run(() -> {putFloat.invokeExact(address, x);});
     }
 
     public static double getDouble(long address) {
@@ -265,7 +265,7 @@ public class Unsafe {
     }
 
     public static void putDouble(long address, double x) {
-        run(() -> putDouble.invokeExact(address, x));
+        run(() -> {putDouble.invokeExact(address, x);});
     }
 
     public static long getAddress(long address) {
@@ -277,11 +277,11 @@ public class Unsafe {
     }
 
     public static void putAddress(long address, long x) {
-        run(() -> putAddress.invokeExact(address, x));
+        run(() -> {putAddress.invokeExact(address, x);});
     }
 
     public static void putAddress(Object object, long address, long x) {
-        run(() -> putObjectAddress.invokeExact(object, address, x));
+        run(() -> {putObjectAddress.invokeExact(object, address, x);});
     }
 
     public static <T> T getUncompressedObject(long address) {
@@ -297,23 +297,23 @@ public class Unsafe {
     }
 
     public static void setMemory(Object o, long offset, long bytes, byte value) {
-        run(() -> setObjectMemory.invokeExact(o, offset, bytes, value));
+        run(() -> {setObjectMemory.invokeExact(o, offset, bytes, value);});
     }
 
     public static void setMemory(long address, long bytes, byte value) {
-        run(() -> setMemory.invokeExact(address, bytes, value));
+        run(() -> {setMemory.invokeExact(address, bytes, value);});
     }
 
     public static void copyMemory(Object srcBase, long srcOffset, Object destBase, long destOffset, long bytes) {
-        run(() -> copyObjectMemory.invokeExact(srcBase, srcOffset, destBase, destOffset, bytes));
+        run(() -> {copyObjectMemory.invokeExact(srcBase, srcOffset, destBase, destOffset, bytes);});
     }
 
     public static void copyMemory(long srcAddress, long destAddress, long bytes) {
-        run(() -> copyMemory.invokeExact(srcAddress, destAddress, bytes));
+        run(() -> {copyMemory.invokeExact(srcAddress, destAddress, bytes);});
     }
 
     public static void freeMemory(long address) {
-        run(() -> freeMemory.invokeExact(address));
+        run(() -> {freeMemory.invokeExact(address);});
     }
 
     public static long objectFieldOffset(Field field) {
@@ -333,7 +333,7 @@ public class Unsafe {
     }
 
     public static void ensureClassInitialized(Class<?> c) {
-        run(() -> ensureClassInitialized.invokeExact(c));
+        run(() -> {ensureClassInitialized.invokeExact(c);});
     }
 
     public static int arrayBaseOffset(Class<?> arrayClass) {
@@ -391,7 +391,7 @@ public class Unsafe {
     }
 
     public static void putReferenceVolatile(Object o, long offset, Object x) {
-        run(() -> putReferenceVolatile.invokeExact(o, offset, x));
+        run(() -> {putReferenceVolatile.invokeExact(o, offset, x);});
     }
 
     public static int getIntVolatile(Object o, long offset) {
@@ -399,7 +399,7 @@ public class Unsafe {
     }
 
     public static void putIntVolatile(Object o, long offset, int x) {
-        run(() -> putIntVolatile.invokeExact(o, offset, x));
+        run(() -> {putIntVolatile.invokeExact(o, offset, x);});
     }
 
     public static boolean getBooleanVolatile(Object o, long offset) {
@@ -407,7 +407,7 @@ public class Unsafe {
     }
 
     public static void putBooleanVolatile(Object o, long offset, boolean x) {
-        run(() -> putBooleanVolatile.invokeExact(o, offset, x));
+        run(() -> {putBooleanVolatile.invokeExact(o, offset, x);});
     }
 
     public static byte getByteVolatile(Object o, long offset) {
@@ -415,7 +415,7 @@ public class Unsafe {
     }
 
     public static void putByteVolatile(Object o, long offset, byte x) {
-        run(() -> putByteVolatile.invokeExact(o, offset, x));
+        run(() -> {putByteVolatile.invokeExact(o, offset, x);});
     }
 
     public static short getShortVolatile(Object o, long offset) {
@@ -423,7 +423,7 @@ public class Unsafe {
     }
 
     public static void putShortVolatile(Object o, long offset, short x) {
-        run(() -> putShortVolatile.invokeExact(o, offset, x));
+        run(() -> {putShortVolatile.invokeExact(o, offset, x);});
     }
 
     public static char getCharVolatile(Object o, long offset) {
@@ -431,7 +431,7 @@ public class Unsafe {
     }
 
     public static void putCharVolatile(Object o, long offset, char x) {
-        run(() -> putCharVolatile.invokeExact(o, offset, x));
+        run(() -> {putCharVolatile.invokeExact(o, offset, x);});
     }
 
     public static long getLongVolatile(Object o, long offset) {
@@ -439,7 +439,7 @@ public class Unsafe {
     }
 
     public static void putLongVolatile(Object o, long offset, long x) {
-        run(() -> putLongVolatile.invokeExact(o, offset, x));
+        run(() -> {putLongVolatile.invokeExact(o, offset, x);});
     }
 
     public static float getFloatVolatile(Object o, long offset) {
@@ -447,7 +447,7 @@ public class Unsafe {
     }
 
     public static void putFloatVolatile(Object o, long offset, float x) {
-        run(() -> putFloatVolatile.invokeExact(o, offset, x));
+        run(() -> {putFloatVolatile.invokeExact(o, offset, x);});
     }
 
     public static double getDoubleVolatile(Object o, long offset) {
@@ -455,7 +455,7 @@ public class Unsafe {
     }
 
     public static void putDoubleVolatile(Object o, long offset, double x) {
-        run(() -> putDoubleVolatile.invokeExact(o, offset, x));
+        run(() -> {putDoubleVolatile.invokeExact(o, offset, x);});
     }
 
     @Deprecated(forRemoval = true)
@@ -464,15 +464,15 @@ public class Unsafe {
     }
 
     public static void putOrderedReference(Object o, long offset, Object x) {
-        run(() -> putOrderedReference.invokeExact(o, offset, x));
+        run(() -> {putOrderedReference.invokeExact(o, offset, x);});
     }
 
     public static void putOrderedInt(Object o, long offset, int x) {
-        run(() -> putOrderedInt.invokeExact(o, offset, x));
+        run(() -> {putOrderedInt.invokeExact(o, offset, x);});
     }
 
     public static void putOrderedLong(Object o, long offset, long x) {
-        run(() -> putOrderedLong.invokeExact(o, offset, x));
+        run(() -> {putOrderedLong.invokeExact(o, offset, x);});
     }
 
     public static int getLoadAverage(double[] loadavg, int nelems) {
@@ -504,19 +504,19 @@ public class Unsafe {
     }
 
     public static void loadFence() {
-        run(loadFence::invokeExact);
+        run(() -> {loadFence.invokeExact();});
     }
 
     public static void storeFence() {
-        run(storeFence::invokeExact);
+        run(() -> {storeFence.invokeExact();});
     }
 
     public static void fullFence() {
-        run (fullFence::invokeExact);
+        run(() -> {fullFence.invokeExact();});
     }
 
     public static void invokeCleaner(ByteBuffer directBuffer) {
-        run(() -> invokeCleaner.invokeExact(directBuffer));
+        run(() -> {invokeCleaner.invokeExact(directBuffer);});
     }
 
     private static <T extends Throwable> T throw0(Throwable throwable) throws T {
@@ -572,7 +572,6 @@ public class Unsafe {
 
     static {
         try {
-            SunUnsafe = sun.misc.Unsafe.class;
             var field = SunUnsafe.getDeclaredField("theUnsafe");
             field.setAccessible(true);
             theSunUnsafe = (sun.misc.Unsafe) field.get(null);
