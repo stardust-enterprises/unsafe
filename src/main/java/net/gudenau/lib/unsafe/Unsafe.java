@@ -9,7 +9,7 @@ import java.security.ProtectionDomain;
 import java.util.logging.Logger;
 import lombok.SneakyThrows;
 
-@SuppressWarnings({"unchecked", "unused", "RedundantSuppression", "ConstantConditions", "SameParameterValue", "CodeBlock2Expr", "Convert2MethodRef"})
+@SuppressWarnings({"unused", "SameParameterValue"})
 public class Unsafe {
     public static final MethodHandles.Lookup trustedLookup;
     public static final Class<?> SunUnsafe = sun.misc.Unsafe.class;
