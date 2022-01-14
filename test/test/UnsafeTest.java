@@ -1,5 +1,6 @@
 package test;
 
+import lombok.val;
 import net.gudenau.lib.unsafe.Unsafe;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.annotation.Testable;
@@ -9,12 +10,12 @@ import org.junit.platform.commons.annotation.Testable;
 public class UnsafeTest {
     @Test
     public void allocateInstance() {
-        assert Unsafe.allocateInstance(UnsafeTest.class) != null;
+        assert Unsafe.allocateInstance(UnsafeTest.class).getClass() == UnsafeTest.class;
     }
 
     @Test
     public void throwable() {
-        String message = "Throwable message";
+        val message = "Throwable message";
 
         try {
             Unsafe.throwException(new Throwable(message));

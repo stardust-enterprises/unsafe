@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 import java.util.logging.Logger;
+import lombok.SneakyThrows;
 
 @SuppressWarnings({"unchecked", "unused", "RedundantSuppression", "ConstantConditions", "SameParameterValue", "CodeBlock2Expr", "Convert2MethodRef"})
 public class Unsafe {
@@ -130,413 +131,456 @@ public class Unsafe {
     private static final MethodHandle fullFence;
     private static final MethodHandle invokeCleaner;
 
+    @SneakyThrows
     public static int getInt(Object o, long offset) {
-        return get(() -> (int) getObjectInt.invokeExact(o, offset));
+        return (int) getObjectInt.invokeExact(o, offset);
     }
 
+    @SneakyThrows
     public static void putInt(Object o, long offset, int x) {
-        run(() -> {putObjectInt.invokeExact(o, offset, x);});
+        putObjectInt.invokeExact(o, offset, x);
     }
 
-    @Deprecated(forRemoval = true)
-    public static <T> T getObject(Object o, long offset) {
-        return get(() -> (T) getObjectReference.invokeExact(o, offset));
-    }
-
-    @Deprecated(forRemoval = true)
-    public static void putObject(Object o, long offset, Object x) {
-        run(() -> {putObjectReference.invokeExact(o, offset, x);});
-    }
-
+    @SneakyThrows
     public static <T> T getReference(Object o, long offset) {
-        return get(() -> (T) getObjectReference.invokeExact(o, offset));
+        return (T) getObjectReference.invokeExact(o, offset);
     }
 
+    @SneakyThrows
     public static void putReference(Object o, long offset, Object x) {
-        run(() -> {putObjectReference.invokeExact(o, offset, x);});
+        putObjectReference.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static boolean getBoolean(Object o, long offset) {
-        return get(() -> (boolean) getObjectBoolean.invokeExact(o, offset));
+        return (boolean) getObjectBoolean.invokeExact(o, offset);
     }
 
+    @SneakyThrows
     public static void putBoolean(Object o, long offset, boolean x) {
-        run(() -> {putObjectBoolean.invokeExact(o, offset, x);});
+        putObjectBoolean.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static byte getByte(Object o, long offset) {
-        return get(() -> (byte) getObjectByte.invokeExact(o, offset));
+        return (byte) getObjectByte.invokeExact(o, offset);
     }
 
+    @SneakyThrows
     public static void putByte(Object o, long offset, byte x) {
-        run(() -> {putObjectByte.invokeExact(o, offset, x);});
+        putObjectByte.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static short getShort(Object o, long offset) {
-        return get(() -> (short) getObjectShort.invokeExact(o, offset));
+        return (short) getObjectShort.invokeExact(o, offset);
     }
 
+    @SneakyThrows
     public static void putShort(Object o, long offset, short x) {
-        run(() -> {putObjectShort.invokeExact(o, offset, x);});
+        putObjectShort.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static char getChar(Object o, long offset) {
-        return get(() -> (char) getObjectChar.invokeExact(o, offset));
+        return (char) getObjectChar.invokeExact(o, offset);
     }
 
+    @SneakyThrows
     public static void putChar(Object o, long offset, char x) {
-        run(() -> {putObjectChar.invokeExact(o, offset, x);});
+        putObjectChar.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static long getLong(Object o, long offset) {
-        return get(() -> (long) getObjectLong.invokeExact(o, offset));
+        return (long) getObjectLong.invokeExact(o, offset);
     }
 
+    @SneakyThrows
     public static void putLong(Object o, long offset, long x) {
-        run(() -> {putObjectLong.invokeExact(o, offset, x);});
+        putObjectLong.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static float getFloat(Object o, long offset) {
-        return get(() -> (float) getObjectFloat.invokeExact(o, offset));
+        return (float) getObjectFloat.invokeExact(o, offset);
     }
 
+    @SneakyThrows
     public static void putFloat(Object o, long offset, float x) {
-        run(() -> {putObjectFloat.invokeExact(o, offset, x);});
+        putObjectFloat.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static double getDouble(Object o, long offset) {
-        return get(() -> (double) getObjectDouble.invokeExact(o, offset));
+        return (double) getObjectDouble.invokeExact(o, offset);
     }
 
+    @SneakyThrows
     public static void putDouble(Object o, long offset, double x) {
-        run(() -> {putObjectDouble.invokeExact(o, offset, x);});
+        putObjectDouble.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static byte getByte(long address) {
-        return get(() -> (byte) getByte.invokeExact(address));
+        return (byte) getByte.invokeExact(address);
     }
 
+    @SneakyThrows
     public static void putByte(long address, byte x) {
-        run(() -> {putByte.invokeExact(address, x);});
+        putByte.invokeExact(address, x);
     }
 
+    @SneakyThrows
     public static short getShort(long address) {
-        return get(() -> (short) getShort.invokeExact(address));
+        return (short) getShort.invokeExact(address);
     }
 
+    @SneakyThrows
     public static void putShort(long address, short x) {
-        run(() -> {putShort.invokeExact(address, x);});
+        putShort.invokeExact(address, x);
     }
 
+    @SneakyThrows
     public static char getChar(long address) {
-        return get(() -> (char) getChar.invokeExact(address));
+        return (char) getChar.invokeExact(address);
     }
 
+    @SneakyThrows
     public static void putChar(long address, char x) {
-        run(() -> {putChar.invokeExact(address, x);});
+        putChar.invokeExact(address, x);
     }
 
+    @SneakyThrows
     public static int getInt(long address) {
-        return get(() -> (int) getInt.invokeExact(address));
+        return (int) getInt.invokeExact(address);
     }
 
+    @SneakyThrows
     public static void putInt(long address, int x) {
-        run(() -> {putInt.invokeExact(address, x);});
+        putInt.invokeExact(address, x);
     }
 
+    @SneakyThrows
     public static long getLong(long address) {
-        return get(() -> (long) getLong.invokeExact(address));
+        return (long) getLong.invokeExact(address);
     }
 
+    @SneakyThrows
     public static void putLong(long address, long x) {
-        run(() -> {putLong.invokeExact(address, x);});
+        putLong.invokeExact(address, x);
     }
 
+    @SneakyThrows
     public static float getFloat(long address) {
-        return get(() -> (float) getFloat.invokeExact(address));
+        return (float) getFloat.invokeExact(address);
     }
 
+    @SneakyThrows
     public static void putFloat(long address, float x) {
-        run(() -> {putFloat.invokeExact(address, x);});
+        putFloat.invokeExact(address, x);
     }
 
+    @SneakyThrows
     public static double getDouble(long address) {
-        return get(() -> (double) getDouble.invokeExact(address));
+        return (double) getDouble.invokeExact(address);
     }
 
+    @SneakyThrows
     public static void putDouble(long address, double x) {
-        run(() -> {putDouble.invokeExact(address, x);});
+        putDouble.invokeExact(address, x);
     }
 
+    @SneakyThrows
     public static long getAddress(long address) {
-        return get(() -> (long) getAddress.invokeExact(address));
+        return (long) getAddress.invokeExact(address);
     }
 
+    @SneakyThrows
     public static long getAddress(Object object, long address) {
-        return get(() -> (long) getObjectAddress.invokeExact(object, address));
+        return (long) getObjectAddress.invokeExact(object, address);
     }
 
+    @SneakyThrows
     public static void putAddress(long address, long x) {
-        run(() -> {putAddress.invokeExact(address, x);});
+        putAddress.invokeExact(address, x);
     }
 
+    @SneakyThrows
     public static void putAddress(Object object, long address, long x) {
-        run(() -> {putObjectAddress.invokeExact(object, address, x);});
+        putObjectAddress.invokeExact(object, address, x);
     }
 
+    @SneakyThrows
     public static <T> T getUncompressedObject(long address) {
-        return get(() -> (T) getUncompressedObject.invokeExact(address));
+        return (T) getUncompressedObject.invokeExact(address);
     }
 
+    @SneakyThrows
     public static long allocateMemory(long bytes) {
-        return get(() -> (long) allocateMemory.invokeExact(bytes));
+        return (long) allocateMemory.invokeExact(bytes);
     }
 
+    @SneakyThrows
     public static long reallocateMemory(long address, long bytes) {
-        return get(() -> (long) reallocateMemory.invokeExact(address, bytes));
+        return (long) reallocateMemory.invokeExact(address, bytes);
     }
 
+    @SneakyThrows
     public static void setMemory(Object o, long offset, long bytes, byte value) {
-        run(() -> {setObjectMemory.invokeExact(o, offset, bytes, value);});
+        setObjectMemory.invokeExact(o, offset, bytes, value);
     }
 
+    @SneakyThrows
     public static void setMemory(long address, long bytes, byte value) {
-        run(() -> {setMemory.invokeExact(address, bytes, value);});
+        setMemory.invokeExact(address, bytes, value);
     }
 
+    @SneakyThrows
     public static void copyMemory(Object srcBase, long srcOffset, Object destBase, long destOffset, long bytes) {
-        run(() -> {copyObjectMemory.invokeExact(srcBase, srcOffset, destBase, destOffset, bytes);});
+        copyObjectMemory.invokeExact(srcBase, srcOffset, destBase, destOffset, bytes);
     }
 
+    @SneakyThrows
     public static void copyMemory(long srcAddress, long destAddress, long bytes) {
-        run(() -> {copyMemory.invokeExact(srcAddress, destAddress, bytes);});
+        copyMemory.invokeExact(srcAddress, destAddress, bytes);
     }
 
+    @SneakyThrows
     public static void freeMemory(long address) {
-        run(() -> {freeMemory.invokeExact(address);});
+        freeMemory.invokeExact(address);
     }
 
+    @SneakyThrows
     public static long objectFieldOffset(Field field) {
-        return get(() -> (long) objectFieldOffset.invokeExact(field));
+        return (long) objectFieldOffset.invokeExact(field);
     }
 
+    @SneakyThrows
     public static long staticFieldOffset(Field field) {
-        return get(() -> (long) staticFieldOffset.invokeExact(field));
+        return (long) staticFieldOffset.invokeExact(field);
     }
 
+    @SneakyThrows
     public static Object staticFieldBase(Field field) {
-        return get(() -> (Object) staticFieldBase.invokeExact(field));
+        return (Object) staticFieldBase.invokeExact(field);
     }
 
+    @SneakyThrows
     public static boolean shouldBeInitialized(Class<?> klass) {
-        return get(() -> (boolean) shouldBeInitialized.invokeExact(klass));
+        return (boolean) shouldBeInitialized.invokeExact(klass);
     }
 
+    @SneakyThrows
     public static void ensureClassInitialized(Class<?> c) {
-        run(() -> {ensureClassInitialized.invokeExact(c);});
+        ensureClassInitialized.invokeExact(c);
     }
 
+    @SneakyThrows
     public static int arrayBaseOffset(Class<?> arrayClass) {
-        return get(() -> (int) arrayBaseOffset.invokeExact(arrayClass));
+        return (int) arrayBaseOffset.invokeExact(arrayClass);
     }
 
+    @SneakyThrows
     public static <T> int arrayIndexScale(Class<T> arrayClass) {
-        return get(() -> (int) arrayIndexScale.invokeExact(arrayClass));
+        return (int) arrayIndexScale.invokeExact(arrayClass);
     }
 
+    @SneakyThrows
     public static int addressSize() {
-        return get(() -> (int) addressSize.invokeExact());
+        return (int) addressSize.invokeExact();
     }
 
+    @SneakyThrows
     public static int pageSize() {
-        return get(() -> (int) pageSize.invokeExact());
+        return (int) pageSize.invokeExact();
     }
 
+    @SneakyThrows
     public static <T> Class<T> defineClass(String name, byte[] bytecode, int offset, int length, ClassLoader classLoader, ProtectionDomain protectionDomain) {
-        return get(() -> (Class<T>) defineClass.invokeExact(name, bytecode, offset, length, classLoader, protectionDomain));
+        return (Class<T>) defineClass.invokeExact(name, bytecode, offset, length, classLoader, protectionDomain);
     }
 
+    @SneakyThrows
     public static <T> T allocateInstance(Class<T> cls) {
-        return get(() -> (T) allocateInstance.invokeExact(cls));
+        return (T) allocateInstance.invokeExact(cls);
     }
 
     public static RuntimeException throwException(Throwable throwable) {
         return throw0(throwable);
     }
 
+    @SneakyThrows
     public static boolean compareAndSwapObject(Object o, long offset, Object expected, Object x) {
-        return get(() -> (boolean) compareAndSwapReference.invokeExact(o, offset, expected, x));
+        return (boolean) compareAndSwapReference.invokeExact(o, offset, expected, x);
     }
 
+    @SneakyThrows
     public static boolean compareAndSwapInt(Object o, long offset, int expected, int x) {
-        return get(() -> (boolean) compareAndSwapInt.invokeExact(o, offset, expected, x));
+        return (boolean) compareAndSwapInt.invokeExact(o, offset, expected, x);
     }
 
+    @SneakyThrows
     public static boolean compareAndSwapLong(Object object, long offset, long expected, long x) {
-        return get(() -> (boolean) compareAndSwapLong.invokeExact(object, offset, expected, x));
+        return (boolean) compareAndSwapLong.invokeExact(object, offset, expected, x);
     }
 
-    @Deprecated(forRemoval = true)
-    public static <T> T getObjectVolatile(Object object, long offset) {
-        return getReferenceVolatile(object, offset);
-    }
-
-    @Deprecated(forRemoval = true)
-    public static void putObjectVolatile(Object o, long offset, Object x) {
-        putReferenceVolatile(o, offset, x);
-    }
-
+    @SneakyThrows
     public static <T> T getReferenceVolatile(Object object, long offset) {
-        return get(() -> (T) getReferenceVolatile.invokeExact(object, offset));
+        return (T) getReferenceVolatile.invokeExact(object, offset);
     }
 
+    @SneakyThrows
     public static void putReferenceVolatile(Object o, long offset, Object x) {
-        run(() -> {putReferenceVolatile.invokeExact(o, offset, x);});
+        putReferenceVolatile.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static int getIntVolatile(Object o, long offset) {
-        return get(() -> (int) getIntVolatile.invokeExact(o, offset));
+        return (int) getIntVolatile.invokeExact(o, offset);
     }
 
+    @SneakyThrows
     public static void putIntVolatile(Object o, long offset, int x) {
-        run(() -> {putIntVolatile.invokeExact(o, offset, x);});
+        putIntVolatile.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static boolean getBooleanVolatile(Object o, long offset) {
-        return get(() -> (boolean) getBooleanVolatile.invokeExact(o, offset));
+        return (boolean) getBooleanVolatile.invokeExact(o, offset);
     }
 
+    @SneakyThrows
     public static void putBooleanVolatile(Object o, long offset, boolean x) {
-        run(() -> {putBooleanVolatile.invokeExact(o, offset, x);});
+        putBooleanVolatile.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static byte getByteVolatile(Object o, long offset) {
-        return get(() -> (byte) getByteVolatile.invokeExact(o, offset));
+        return (byte) getByteVolatile.invokeExact(o, offset);
     }
 
+    @SneakyThrows
     public static void putByteVolatile(Object o, long offset, byte x) {
-        run(() -> {putByteVolatile.invokeExact(o, offset, x);});
+        putByteVolatile.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static short getShortVolatile(Object o, long offset) {
-        return get(() -> (short) getShortVolatile.invokeExact(o, offset));
+        return (short) getShortVolatile.invokeExact(o, offset);
     }
 
+    @SneakyThrows
     public static void putShortVolatile(Object o, long offset, short x) {
-        run(() -> {putShortVolatile.invokeExact(o, offset, x);});
+        putShortVolatile.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static char getCharVolatile(Object o, long offset) {
-        return get(() -> (char) getCharVolatile.invokeExact(o, offset));
+        return (char) getCharVolatile.invokeExact(o, offset);
     }
 
+    @SneakyThrows
     public static void putCharVolatile(Object o, long offset, char x) {
-        run(() -> {putCharVolatile.invokeExact(o, offset, x);});
+        putCharVolatile.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static long getLongVolatile(Object o, long offset) {
-        return get(() -> (long) getLongVolatile.invokeExact(o, offset));
+        return (long) getLongVolatile.invokeExact(o, offset);
     }
 
+    @SneakyThrows
     public static void putLongVolatile(Object o, long offset, long x) {
-        run(() -> {putLongVolatile.invokeExact(o, offset, x);});
+        putLongVolatile.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static float getFloatVolatile(Object o, long offset) {
-        return get(() -> (float) getFloatVolatile.invokeExact(o, offset));
+        return (float) getFloatVolatile.invokeExact(o, offset);
     }
 
+    @SneakyThrows
     public static void putFloatVolatile(Object o, long offset, float x) {
-        run(() -> {putFloatVolatile.invokeExact(o, offset, x);});
+        putFloatVolatile.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static double getDoubleVolatile(Object o, long offset) {
-        return get(() -> (double) getDoubleVolatile.invokeExact(o, offset));
+        return (double) getDoubleVolatile.invokeExact(o, offset);
     }
 
+    @SneakyThrows
     public static void putDoubleVolatile(Object o, long offset, double x) {
-        run(() -> {putDoubleVolatile.invokeExact(o, offset, x);});
+        putDoubleVolatile.invokeExact(o, offset, x);
     }
 
-    @Deprecated(forRemoval = true)
-    public static void putOrderedObject(Object o, long offset, Object x) {
-        putOrderedReference(o, offset, x);
-    }
-
+    @SneakyThrows
     public static void putOrderedReference(Object o, long offset, Object x) {
-        run(() -> {putOrderedReference.invokeExact(o, offset, x);});
+        putOrderedReference.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static void putOrderedInt(Object o, long offset, int x) {
-        run(() -> {putOrderedInt.invokeExact(o, offset, x);});
+        putOrderedInt.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static void putOrderedLong(Object o, long offset, long x) {
-        run(() -> {putOrderedLong.invokeExact(o, offset, x);});
+        putOrderedLong.invokeExact(o, offset, x);
     }
 
+    @SneakyThrows
     public static int getLoadAverage(double[] loadavg, int nelems) {
-        return get(() -> (int) getLoadAverage.invokeExact(loadavg, nelems));
+        return (int) getLoadAverage.invokeExact(loadavg, nelems);
     }
+    @SneakyThrows
     public static int getAndAddInt(Object o, long offset, int delta) {
-        return get(() -> (int) getAndAddInt.invokeExact(o, offset, delta));
+        return (int) getAndAddInt.invokeExact(o, offset, delta);
     }
 
+    @SneakyThrows
     public static long getAndAddLong(Object o, long offset, long delta) {
-        return get(() -> (long) getAndAddLong.invokeExact(o, offset, delta));
+        return (long) getAndAddLong.invokeExact(o, offset, delta);
     }
 
+    @SneakyThrows
     public static int getAndSetInt(Object o, long offset, int newValue) {
-        return get(() -> (int) getAndSetInt.invokeExact(o, offset, newValue));
+        return (int) getAndSetInt.invokeExact(o, offset, newValue);
     }
 
+    @SneakyThrows
     public static long getAndSetLong(Object o, long offset, long newValue) {
-        return get(() -> (long) getAndSetLong.invokeExact(o, offset, newValue));
+        return (long) getAndSetLong.invokeExact(o, offset, newValue);
     }
 
-    @Deprecated(forRemoval = true)
-    public static <T> T getAndSetObject(Object o, long offset, T newValue) {
-        return getAndSetReference(o, offset, newValue);
-    }
-
+    @SneakyThrows
     public static <T> T getAndSetReference(Object o, long offset, T newValue) {
-        return get(() -> (T) getAndSetReference.invokeExact(o, offset, (Object) newValue));
+        return (T) getAndSetReference.invokeExact(o, offset, (Object) newValue);
     }
 
+    @SneakyThrows
     public static void loadFence() {
-        run(() -> {loadFence.invokeExact();});
+        loadFence.invokeExact();
     }
 
+    @SneakyThrows
     public static void storeFence() {
-        run(() -> {storeFence.invokeExact();});
+        storeFence.invokeExact();
     }
 
+    @SneakyThrows
     public static void fullFence() {
-        run(() -> {fullFence.invokeExact();});
+        fullFence.invokeExact();
     }
 
+    @SneakyThrows
     public static void invokeCleaner(ByteBuffer directBuffer) {
-        run(() -> {invokeCleaner.invokeExact(directBuffer);});
+        invokeCleaner.invokeExact(directBuffer);
     }
 
     private static <T extends Throwable> T throw0(Throwable throwable) throws T {
         throw (T) throwable;
-    }
-
-    private static void run(Runnable runnable) {
-        try {
-            runnable.run();
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
-    }
-
-    private static <T> T get(Supplier<T> supplier) {
-        try {
-            return supplier.get();
-        } catch (Throwable throwable) {
-            throw throwException(throwable);
-        }
     }
 
     private static MethodHandle bind(String method, String alternative, Class<?> returnType, Class<?>... parameterTypes) {
@@ -572,9 +616,7 @@ public class Unsafe {
 
     static {
         try {
-            var field = SunUnsafe.getDeclaredField("theUnsafe");
-            field.setAccessible(true);
-            theSunUnsafe = (sun.misc.Unsafe) field.get(null);
+            theSunUnsafe = (sun.misc.Unsafe) MethodHandles.privateLookupIn(SunUnsafe, MethodHandles.lookup()).findStaticVarHandle(SunUnsafe, "theUnsafe", SunUnsafe).get();
             trustedLookup = (MethodHandles.Lookup) theSunUnsafe.getObject(MethodHandles.Lookup.class, theSunUnsafe.staticFieldOffset(MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP")));
 
             Unsafe = Class.forName("jdk.internal.misc.Unsafe");
