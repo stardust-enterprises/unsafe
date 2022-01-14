@@ -606,14 +606,6 @@ public class Unsafe {
         return bind(method, null, returnType, parameterTypes);
     }
 
-    private interface Runnable {
-        void run() throws Throwable;
-    }
-
-    private interface Supplier<T> {
-        T get() throws Throwable;
-    }
-
     static {
         try {
             theSunUnsafe = (sun.misc.Unsafe) MethodHandles.privateLookupIn(SunUnsafe, MethodHandles.lookup()).findStaticVarHandle(SunUnsafe, "theUnsafe", SunUnsafe).get();
