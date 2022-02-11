@@ -15,6 +15,7 @@ repositories {
 }
 
 dependencies {
+    annotationProcessor("net.auoeke:uncheck:0.0.1")
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
