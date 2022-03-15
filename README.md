@@ -87,6 +87,6 @@ as per [requested by gudenau][license-req]
 
 <!-- Proofs -->
 
-[fork-proof]: https://github.com/stardust-enterprises/unsafe/blob/master/.github/screenshots/fork_proof.png, "proof that I can publish this fork"
+[fork-proof]: https://github.com/stardust-enterprises/unsafe/blob/master/.github/screenshots/fork_proof.png "proof that I can publish this fork"
 
-[license-req]: https://github.com/stardust-enterprises/unsafe/blob/master/.github/screenshots/license_proof.png, "license requirement"
+[license-req]: https://github.com/stardust-enterprises/unsafe/blob/master/.github/screenshots/license_proof.png "license requirement"
