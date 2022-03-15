@@ -4,7 +4,7 @@ import net.gudenau.lib.unsafe.Unsafe;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.annotation.Testable;
 
-@SuppressWarnings("StringEquality")
+@SuppressWarnings("ALL")
 @Testable
 public class UnsafeTest extends Unsafe {
     @Test void allocateInstanceTest() {
@@ -12,7 +12,7 @@ public class UnsafeTest extends Unsafe {
     }
 
     @Test void throwable() {
-        var message = "Throwable message";
+        String message = "Throwable message";
 
         try {
             throwException(new Throwable(message));

@@ -7,15 +7,15 @@ plugins {
 group("net.gudenau.lib")
 version("1.7.1")
 
-javaVersion(16)
+javaVersion(8)
 
 repositories {
     mavenCentral()
-    maven("maven.auoeke.net")
+    maven("https://jitpack.io")
 }
 
 dependencies {
-    annotationProcessor("net.auoeke:uncheck:0.0.1")
+    annotationProcessor("com.github.stardust-enterprises:uncheck:8dff7734a4")
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
