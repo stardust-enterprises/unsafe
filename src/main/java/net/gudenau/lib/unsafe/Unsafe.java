@@ -13,14 +13,14 @@ import java.util.logging.Logger;
 public class Unsafe {
     public static final Class<?> SunUnsafe = sun.misc.Unsafe.class;
     public static final Class<?> Unsafe = Class.forName("jdk.internal.misc.Unsafe");
-    public static final sun.misc.Unsafe theSunUnsafe = (sun.misc.Unsafe) MethodHandles.privateLookupIn(SunUnsafe, MethodHandles.lookup()).findStaticVarHandle(SunUnsafe, "theUnsafe", SunUnsafe).get();
+    public static final sun.misc.Unsafe theSunUnsafe = (sun.misc.Unsafe) getSunUnsafe();
     public static final MethodHandles.Lookup trustedLookup = (MethodHandles.Lookup) theSunUnsafe.getObject(MethodHandles.Lookup.class, theSunUnsafe.staticFieldOffset(MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP")));
     public static final Object theUnsafe = trustedLookup.findStatic(Unsafe, "getUnsafe", MethodType.methodType(Unsafe)).invoke();
 
     private static final MethodHandle getObjectInt = bind("getInt", int.class, Object.class, long.class);
     private static final MethodHandle putObjectInt = bind("putInt", void.class, Object.class, long.class, int.class);
-    private static final MethodHandle getObjectReference = bind("getReference", Object.class, Object.class, long.class);
-    private static final MethodHandle putObjectReference = bind("putReference", void.class, Object.class, long.class, Object.class);
+    private static final MethodHandle getObjectReference = bind("getReference", "getObject", Object.class, Object.class, long.class);
+    private static final MethodHandle putObjectReference = bind("putReference", "putObject", void.class, Object.class, long.class, Object.class);
     private static final MethodHandle getObjectBoolean = bind("getBoolean", boolean.class, Object.class, long.class);
     private static final MethodHandle putObjectBoolean = bind("putBoolean", void.class, Object.class, long.class, boolean.class);
     private static final MethodHandle getObjectByte = bind("getByte", byte.class, Object.class, long.class);
@@ -53,7 +53,7 @@ public class Unsafe {
     private static final MethodHandle getObjectAddress = bind("getAddress", long.class, Object.class, long.class);
     private static final MethodHandle putAddress = bind("putAddress", void.class, long.class, long.class);
     private static final MethodHandle putObjectAddress = bind("putAddress", void.class, Object.class, long.class, long.class);
-    private static final MethodHandle getUncompressedObject = bind("getUncompressedObject", Object.class, long.class);
+    private static final MethodHandle getUncompressedObject = bind("getUncompressedObject", Object.class, long.class); // not in Sun
     private static final MethodHandle allocateMemory = bind("allocateMemory", long.class, long.class);
     private static final MethodHandle reallocateMemory = bind("reallocateMemory", long.class, long.class, long.class);
     private static final MethodHandle setObjectMemory = bind("setMemory", void.class, Object.class, long.class, long.class, byte.class);
@@ -72,11 +72,11 @@ public class Unsafe {
     private static final MethodHandle pageSize = bind("pageSize", int.class);
     private static final MethodHandle defineClass = bind("defineClass", Class.class, String.class, byte[].class, int.class, int.class, ClassLoader.class, ProtectionDomain.class);
     private static final MethodHandle allocateInstance = bind("allocateInstance", Object.class, Class.class);
-    private static final MethodHandle compareAndSwapReference = bind("compareAndSetReference", boolean.class, Object.class, long.class, Object.class, Object.class);
-    private static final MethodHandle compareAndSwapInt = bind("compareAndSetInt", boolean.class, Object.class, long.class, int.class, int.class);
-    private static final MethodHandle compareAndSwapLong = bind("compareAndSetLong", boolean.class, Object.class, long.class, long.class, long.class);
-    private static final MethodHandle getReferenceVolatile = bind("getReferenceVolatile", Object.class, Object.class, long.class);
-    private static final MethodHandle putReferenceVolatile = bind("putReferenceVolatile", void.class, Object.class, long.class, Object.class);
+    private static final MethodHandle compareAndSwapReference = bind("compareAndSetReference", "compareAndSwapObject", boolean.class, Object.class, long.class, Object.class, Object.class);
+    private static final MethodHandle compareAndSwapInt = bind("compareAndSetInt", "compareAndSwapInt", boolean.class, Object.class, long.class, int.class, int.class);
+    private static final MethodHandle compareAndSwapLong = bind("compareAndSetLong", "compareAndSwapLong", boolean.class, Object.class, long.class, long.class, long.class);
+    private static final MethodHandle getReferenceVolatile = bind("getReferenceVolatile", "getObjectVolatile", Object.class, Object.class, long.class);
+    private static final MethodHandle putReferenceVolatile = bind("putReferenceVolatile", "putObjectVolatile", void.class, Object.class, long.class, Object.class);
     private static final MethodHandle getIntVolatile = bind("getIntVolatile", int.class, Object.class, long.class);
     private static final MethodHandle putIntVolatile = bind("putIntVolatile", void.class, Object.class, long.class, int.class);
     private static final MethodHandle getBooleanVolatile = bind("getBooleanVolatile", boolean.class, Object.class, long.class);
@@ -93,19 +93,19 @@ public class Unsafe {
     private static final MethodHandle putFloatVolatile = bind("putFloatVolatile", void.class, Object.class, long.class, float.class);
     private static final MethodHandle getDoubleVolatile = bind("getDoubleVolatile", double.class, Object.class, long.class);
     private static final MethodHandle putDoubleVolatile = bind("putDoubleVolatile", void.class, Object.class, long.class, double.class);
-    private static final MethodHandle putOrderedReference = bind("putReferenceRelease", void.class, Object.class, long.class, Object.class);
-    private static final MethodHandle putOrderedInt = bind("putIntRelease", void.class, Object.class, long.class, int.class);
-    private static final MethodHandle putOrderedLong = bind("putLongRelease", void.class, Object.class, long.class, long.class);
+    private static final MethodHandle putOrderedReference = bind("putReferenceRelease", "putOrderedObject", void.class, Object.class, long.class, Object.class);
+    private static final MethodHandle putOrderedInt = bind("putIntRelease", "putOrderedInt", void.class, Object.class, long.class, int.class); // not in Sun
+    private static final MethodHandle putOrderedLong = bind("putLongRelease", "putOrderedLong", void.class, Object.class, long.class, long.class); // not in Sun
     private static final MethodHandle getLoadAverage = bind("getLoadAverage", int.class, double[].class, int.class);
     private static final MethodHandle getAndAddInt = bind("getAndAddInt", int.class, Object.class, long.class, int.class);
     private static final MethodHandle getAndAddLong = bind("getAndAddLong", long.class, Object.class, long.class, long.class);
     private static final MethodHandle getAndSetInt = bind("getAndSetInt", int.class, Object.class, long.class, int.class);
     private static final MethodHandle getAndSetLong = bind("getAndSetLong", long.class, Object.class, long.class, long.class);
-    private static final MethodHandle getAndSetReference = bind("getAndSetReference", Object.class, Object.class, long.class, Object.class);
+    private static final MethodHandle getAndSetReference = bind("getAndSetReference", "getAndSetObject", Object.class, Object.class, long.class, Object.class);
     private static final MethodHandle loadFence = bind("loadFence", void.class);
     private static final MethodHandle storeFence = bind("storeFence", void.class);
     private static final MethodHandle fullFence = bind("fullFence", void.class);
-    private static final MethodHandle invokeCleaner = bind("invokeCleaner", void.class, ByteBuffer.class);
+    private static final MethodHandle invokeCleaner = bind("invokeCleaner", void.class, ByteBuffer.class); // not in Sun
 
     public static final int ARRAY_BOOLEAN_BASE_OFFSET = arrayBaseOffset(boolean[].class);
     public static final int ARRAY_BYTE_BASE_OFFSET = arrayBaseOffset(byte[].class);
@@ -275,7 +275,11 @@ public class Unsafe {
     }
 
     public static <T> T getUncompressedObject(long address) {
-        return (T) getUncompressedObject.invokeExact(address);
+        try {
+            return (T) getUncompressedObject.invokeExact(address);
+        } catch (Throwable throwable) {
+            throw new UnsupportedOperationException("getUncompressedObject isn't supported on Java 8!");
+        }
     }
 
     public static long allocateMemory(long bytes) {
@@ -487,7 +491,11 @@ public class Unsafe {
     }
 
     public static void invokeCleaner(ByteBuffer directBuffer) {
-        invokeCleaner.invokeExact(directBuffer);
+        try {
+            invokeCleaner.invokeExact(directBuffer);
+        } catch (Throwable throwable) {
+            throw new UnsupportedOperationException("invokeCleaner isn't supported on Java 8!");
+        }
     }
 
     private static MethodHandle bind(String method, String alternative, Class<?> returnType, Class<?>... parameterTypes) {
@@ -510,5 +518,15 @@ public class Unsafe {
 
     private static MethodHandle bind(String method, Class<?> returnType, Class<?>... parameterTypes) {
         return bind(method, null, returnType, parameterTypes);
+    }
+
+    public static Object getSunUnsafe() {
+        try {
+            return MethodHandles.privateLookupIn(SunUnsafe, MethodHandles.lookup()).findStaticVarHandle(SunUnsafe, "theUnsafe", SunUnsafe).get();
+        } catch (Throwable throwable) {
+            Field f = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
+            f.setAccessible(true);
+            return f.get(null);
+        }
     }
 }
