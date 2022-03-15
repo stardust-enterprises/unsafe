@@ -6,7 +6,7 @@
 allows for static access to Java's Unsafe API.
 
 this project is a fork of [auoeke's java-unsafe fork][auoeke-unsafe],
-built for [Java 8][jvm] and published on [maven central][mvnc].
+compiled for [Java 8][jvm] and published on [maven central][mvnc].
 
 **Note:** [proof that I am allowed to publish this.][fork-proof]
 
@@ -51,7 +51,7 @@ describing what you changed, why and how.
 # licensing
 
 this project is under the [CC0-1.0 license][project-license]
-like the original project: [java-unsafe by gudenau][original-license]
+like the original project: [auoeke's license][original-license]
 
 <!-- Links -->
 
@@ -65,7 +65,7 @@ like the original project: [java-unsafe by gudenau][original-license]
 
 [auoeke-unsafe]: https://github.com/auoeke/unsafe "auoeke's unsafe project"
 
-[original-license]: https://github.com/gudenau/java-unsafe/blob/master/LICENSE "gudenau's java-unsafe license"
+[original-license]: https://github.com/auoeke/unsafe/blob/master/LICENSE "auoeke's unsafe license"
 
 <!-- Project Links -->
 
