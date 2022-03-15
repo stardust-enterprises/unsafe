@@ -77,16 +77,16 @@ as per [requested by gudenau][license-req]
 
 [project-gradle-ci]: https://github.com/stardust-enterprises/unsafe/actions/workflows/gradle-ci.yml "gradle ci workflow"
 
-[project-license]: https://github.com/stardust-enterprises/unsafe/blob/trunk/LICENSE "LICENSE source file"
+[project-license]: https://github.com/stardust-enterprises/unsafe/blob/master/LICENSE "LICENSE source file"
 
 <!-- Badges -->
 
 [badge-mvnc]: https://maven-badges.herokuapp.com/maven-central/fr.stardustenterprises/unsafe/badge.svg "maven central badge"
 
-[badge-github-ci]: https://github.com/stardust-enterprises/unsafe/actions/workflows/build.yml/badge.svg?branch=trunk "github actions badge"
+[badge-github-ci]: https://github.com/stardust-enterprises/unsafe/actions/workflows/build.yml/badge.svg?branch=master "github actions badge"
 
 <!-- Proofs -->
 
-[fork-proof]: https://github.com/stardust-enterprises/unsafe/blob/trunk/.github/screenshots/fork_proof.png, "proof that I can publish this fork"
+[fork-proof]: https://github.com/stardust-enterprises/unsafe/blob/master/.github/screenshots/fork_proof.png, "proof that I can publish this fork"
 
-[license-req]: https://github.com/stardust-enterprises/unsafe/blob/trunk/.github/screenshots/license_proof.png, "license requirement"
+[license-req]: https://github.com/stardust-enterprises/unsafe/blob/master/.github/screenshots/license_proof.png, "license requirement"
