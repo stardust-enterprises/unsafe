@@ -94,8 +94,8 @@ public class Unsafe {
     private static final MethodHandle getDoubleVolatile = bind("getDoubleVolatile", double.class, Object.class, long.class);
     private static final MethodHandle putDoubleVolatile = bind("putDoubleVolatile", void.class, Object.class, long.class, double.class);
     private static final MethodHandle putOrderedReference = bind("putReferenceRelease", "putOrderedObject", void.class, Object.class, long.class, Object.class);
-    private static final MethodHandle putOrderedInt = bind("putIntRelease", "putOrderedInt", void.class, Object.class, long.class, int.class); // not in Sun
-    private static final MethodHandle putOrderedLong = bind("putLongRelease", "putOrderedLong", void.class, Object.class, long.class, long.class); // not in Sun
+    private static final MethodHandle putOrderedInt = bind("putIntRelease", "putOrderedInt", void.class, Object.class, long.class, int.class);
+    private static final MethodHandle putOrderedLong = bind("putLongRelease", "putOrderedLong", void.class, Object.class, long.class, long.class);
     private static final MethodHandle getLoadAverage = bind("getLoadAverage", int.class, double[].class, int.class);
     private static final MethodHandle getAndAddInt = bind("getAndAddInt", int.class, Object.class, long.class, int.class);
     private static final MethodHandle getAndAddLong = bind("getAndAddLong", long.class, Object.class, long.class, long.class);
