@@ -499,7 +499,7 @@ public class Unsafe {
             }
         } catch (Throwable throwable) {
             if (alternative == null) {
-                Logger.getLogger("Unsafe").log(Level.SEVERE, "Unable to access Unsafe method %s%s.%n".formatted(method, MethodType.methodType(returnType, parameterTypes)), throwable);
+                Logger.getLogger("Unsafe").log(Level.SEVERE, String.format("Unable to access Unsafe method %s%s.%n", method, MethodType.methodType(returnType, parameterTypes)), throwable);
 
                 return null;
             }
