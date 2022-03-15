@@ -1,5 +1,4 @@
-.*
-!/.gitignore
-build
-out
-run
+.gradle/
+.idea/
+**bin/
+**build/

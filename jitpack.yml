@@ -1,3 +1,0 @@
-# JitPack publishing yml - used for CI and externals
-jdk:
-  - openjdk17
