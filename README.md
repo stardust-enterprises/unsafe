@@ -5,8 +5,7 @@
 
 allows for static access to Java's Unsafe API.
 
-this project is a fork of [auoeke's java-unsafe fork][auoeke-unsafe],
-compiled for [Java 8][jvm] and published on [maven central][mvnc].
+this project is a fork of [auoeke's java-unsafe fork][auoeke-unsafe] for [Java 8][jvm] and published on [maven central][mvnc].
 
 **Note:** [proof that I am allowed to publish this.][fork-proof]
 
