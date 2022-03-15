@@ -5,13 +5,15 @@
 
 allows for static access to Java's Unsafe API.
 
-this project is a fork of [auoeke's unsafe][auoeke-unsafe], built for [Java 8][jvm] and published on [maven central][mvnc].
+this project is a fork of [auoeke's java-unsafe fork][auoeke-unsafe],
+built for [Java 8][jvm] and published on [maven central][mvnc].
 
 **Note:** [proof that I am allowed to publish this.][fork-proof]
 
 # importing
 
-you can import [unsafe][project-url] from [maven central][mvnc] by adding it to your dependencies:
+you can import [unsafe][project-url] from [maven central][mvnc]
+by adding it to your dependencies:
 
 ## gradle
 
@@ -48,8 +50,8 @@ describing what you changed, why and how.
 
 # licensing
 
-this project is under the [CC-BY-4.0 license][project-license], 
-as per [requested by gudenau][license-req]
+this project is under the [CC0-1.0 license][project-license]
+like the original project: [java-unsafe by gudenau][original-license]
 
 <!-- Links -->
 
@@ -62,6 +64,8 @@ as per [requested by gudenau][license-req]
 [mvnc]: https://repo1.maven.org/maven2/ "maven central website"
 
 [auoeke-unsafe]: https://github.com/auoeke/unsafe "auoeke's unsafe project"
+
+[original-license]: https://github.com/gudenau/java-unsafe/blob/master/LICENSE "gudenau's java-unsafe license"
 
 <!-- Project Links -->
 
@@ -88,5 +92,3 @@ as per [requested by gudenau][license-req]
 <!-- Proofs -->
 
 [fork-proof]: https://github.com/stardust-enterprises/unsafe/blob/master/.github/screenshots/fork_proof.png "proof that I can publish this fork"
-
-[license-req]: https://github.com/stardust-enterprises/unsafe/blob/master/.github/screenshots/license_proof.png "license requirement"

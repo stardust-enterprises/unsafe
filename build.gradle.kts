@@ -179,11 +179,15 @@ nexusPublishing.repositories.sonatype {
 }
 
 // Task priority
-tasks.getByName("closeAndReleaseSonatypeStagingRepository").mustRunAfter("publishToSonatype")
+tasks.getByName("closeAndReleaseSonatypeStagingRepository")
+    .mustRunAfter("publishToSonatype")
 
 // Wrapper task since calling both one after the other
 // in IntellIJ seems to cause some problems.
 tasks.create("releaseToSonatype") {
-    this.dependsOn("publishToSonatype", "closeAndReleaseSonatypeStagingRepository")
+    this.dependsOn(
+        "publishToSonatype",
+        "closeAndReleaseSonatypeStagingRepository"
+    )
     this.group = "publishing"
 }

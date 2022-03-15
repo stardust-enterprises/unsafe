@@ -7,12 +7,12 @@ object Coordinates {
     const val REPO_ID = "stardust-enterprises/$NAME"
 
     const val GROUP = "fr.stardustenterprises"
-    const val VERSION = "1.0.0"
+    const val VERSION = "1.7.1"
 }
 
 object Pom {
     val licenses = arrayOf(
-        License("CC-BY-4.0", "https://creativecommons.org/licenses/by/4.0/")
+        License("CC0-1.0", "https://creativecommons.org/publicdomain/zero/1.0/")
     )
     val developers = arrayOf(
         Developer("xtrm"),
