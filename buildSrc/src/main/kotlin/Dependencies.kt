@@ -4,6 +4,6 @@ object Plugins {
 }
 
 object Dependencies {
-    const val UNCHECK = "8dff7734a4"
+    const val UNCHECK = "2911f4d41d"
     const val JUNIT = "5.8.2"
 }

@@ -12,10 +12,10 @@ import java.util.logging.Logger;
 @SuppressWarnings({"unused", "SameParameterValue"})
 public class Unsafe {
     public static final Class<?> SunUnsafe = sun.misc.Unsafe.class;
-    public static final Class<?> Unsafe = Class.forName("jdk.internal.misc.Unsafe");
+    public static final Class<?> Unsafe = findJdkUnsafe();
     public static final sun.misc.Unsafe theSunUnsafe = (sun.misc.Unsafe) getSunUnsafe();
     public static final MethodHandles.Lookup trustedLookup = (MethodHandles.Lookup) theSunUnsafe.getObject(MethodHandles.Lookup.class, theSunUnsafe.staticFieldOffset(MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP")));
-    public static final Object theUnsafe = trustedLookup.findStatic(Unsafe, "getUnsafe", MethodType.methodType(Unsafe)).invoke();
+    public static final Object theUnsafe = getJdkUnsafe();
 
     private static final MethodHandle getObjectInt = bind("getInt", int.class, Object.class, long.class);
     private static final MethodHandle putObjectInt = bind("putInt", void.class, Object.class, long.class, int.class);
@@ -50,10 +50,10 @@ public class Unsafe {
     private static final MethodHandle getDouble = bind("getDouble", double.class, long.class);
     private static final MethodHandle putDouble = bind("putDouble", void.class, long.class, double.class);
     private static final MethodHandle getAddress = bind("getAddress", long.class, long.class);
-    private static final MethodHandle getObjectAddress = bind("getAddress", long.class, Object.class, long.class);
+    private static final MethodHandle getObjectAddress = bind(true, "getAddress", long.class, Object.class, long.class); // not in Sun
     private static final MethodHandle putAddress = bind("putAddress", void.class, long.class, long.class);
-    private static final MethodHandle putObjectAddress = bind("putAddress", void.class, Object.class, long.class, long.class);
-    private static final MethodHandle getUncompressedObject = bind("getUncompressedObject", Object.class, long.class); // not in Sun
+    private static final MethodHandle putObjectAddress = bind(true, "putAddress", void.class, Object.class, long.class, long.class); // not in Sun
+    private static final MethodHandle getUncompressedObject = bind(true, "getUncompressedObject", Object.class, long.class); // not in Sun
     private static final MethodHandle allocateMemory = bind("allocateMemory", long.class, long.class);
     private static final MethodHandle reallocateMemory = bind("reallocateMemory", long.class, long.class, long.class);
     private static final MethodHandle setObjectMemory = bind("setMemory", void.class, Object.class, long.class, long.class, byte.class);
@@ -105,7 +105,7 @@ public class Unsafe {
     private static final MethodHandle loadFence = bind("loadFence", void.class);
     private static final MethodHandle storeFence = bind("storeFence", void.class);
     private static final MethodHandle fullFence = bind("fullFence", void.class);
-    private static final MethodHandle invokeCleaner = bind("invokeCleaner", void.class, ByteBuffer.class); // not in Sun
+    private static final MethodHandle invokeCleaner = bind(true, "invokeCleaner", void.class, ByteBuffer.class); // not in Sun
 
     public static final int ARRAY_BOOLEAN_BASE_OFFSET = arrayBaseOffset(boolean[].class);
     public static final int ARRAY_BYTE_BASE_OFFSET = arrayBaseOffset(byte[].class);
@@ -263,7 +263,11 @@ public class Unsafe {
     }
 
     public static long getAddress(Object object, long address) {
-        return (long) getObjectAddress.invokeExact(object, address);
+        try {
+            return (long) getObjectAddress.invokeExact(object, address);
+        } catch (Throwable throwable) {
+            throw new UnsupportedOperationException("getObjectAddress isn't supported on Java 8!");
+        }
     }
 
     public static void putAddress(long address, long x) {
@@ -271,7 +275,11 @@ public class Unsafe {
     }
 
     public static void putAddress(Object object, long address, long x) {
-        putObjectAddress.invokeExact(object, address, x);
+        try {
+            putObjectAddress.invokeExact(object, address, x);
+        } catch (Throwable throwable) {
+            throw new UnsupportedOperationException("putObjectAddress isn't supported on Java 8!");
+        }
     }
 
     public static <T> T getUncompressedObject(long address) {
@@ -498,35 +506,63 @@ public class Unsafe {
         }
     }
 
-    private static MethodHandle bind(String method, String alternative, Class<?> returnType, Class<?>... parameterTypes) {
+    private static MethodHandle bind(boolean onlyJ8, String method, String alternative, Class<?> returnType, Class<?>... parameterTypes) {
+        if(onlyJ8 && theUnsafe == null) {
+            return null;
+        }
+
         try {
             try {
+                assert theUnsafe != null;
                 return trustedLookup.bind(theUnsafe, method, MethodType.methodType(returnType, parameterTypes));
-            } catch (NoSuchMethodException exception) {
+            } catch (Throwable throwable) {
                 return trustedLookup.bind(theSunUnsafe, method, MethodType.methodType(returnType, parameterTypes));
             }
         } catch (Throwable throwable) {
             if (alternative == null) {
                 Logger.getLogger("Unsafe").log(Level.SEVERE, String.format("Unable to access Unsafe method %s%s.%n", method, MethodType.methodType(returnType, parameterTypes)), throwable);
-
                 return null;
             }
 
-            return bind(method, null, returnType, parameterTypes);
+            return bind(onlyJ8, alternative, null, returnType, parameterTypes);
         }
     }
 
+    private static Class<?> findJdkUnsafe() {
+        try {
+            return Class.forName("jdk.internal.misc.Unsafe");
+        } catch (Throwable throwable) {
+            return null;
+        }
+    }
+
+    private static MethodHandle bind(boolean onlyJ8, String method, Class<?> returnType, Class<?>... parameterTypes) {
+        return bind(onlyJ8, method, null, returnType, parameterTypes);
+    }
+
+    private static MethodHandle bind(String method, String alternative, Class<?> returnType, Class<?>... parameterTypes) {
+        return bind(false, method, alternative, returnType, parameterTypes);
+    }
+
     private static MethodHandle bind(String method, Class<?> returnType, Class<?>... parameterTypes) {
-        return bind(method, null, returnType, parameterTypes);
+        return bind(false, method, null, returnType, parameterTypes);
     }
 
     public static Object getSunUnsafe() {
         try {
             return MethodHandles.privateLookupIn(SunUnsafe, MethodHandles.lookup()).findStaticVarHandle(SunUnsafe, "theUnsafe", SunUnsafe).get();
         } catch (Throwable throwable) {
-            Field f = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
+            Field f = Class.forName("sun.misc.Unsafe").getDeclaredField("theUnsafe");
             f.setAccessible(true);
             return f.get(null);
+        }
+    }
+
+    public static Object getJdkUnsafe() {
+        try {
+            return trustedLookup.findStatic(Unsafe, "getUnsafe", MethodType.methodType(Unsafe)).invoke();
+        } catch (Throwable throwable) {
+            return null;
         }
     }
 }
